@@ -31,6 +31,7 @@ jobs:
             break
           fi
         done
+        echo "$adicionar_label"
 
     - name: Set output
       run: echo "adicionar_label=${adicionar_label}" >> $GITHUB_ENV
