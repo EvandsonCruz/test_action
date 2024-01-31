@@ -33,10 +33,10 @@ jobs:
         done
 
     - name: Set output
-    run: echo "{adicionar_label}={$adicionar_label}" >> $GITHUB_OUTPUT
+      run: echo "adicionar_label=${adicionar_label}" >> $GITHUB_ENV
 
     - name: Adicionar Label se qualquer palavra-chave estiver presente
-      if: steps.verificar-conteudo.outputs.adicionar_label == 'true'
+      if: env.adicionar_label == 'true'
       run: echo "Adicionando a label..." && gh pr label add ${{ github.event.number }} $label
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
