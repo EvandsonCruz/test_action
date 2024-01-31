@@ -1,0 +1,42 @@
+name: check content and add label
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  verificar-conteudo:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v2
+
+    - name: check content and add label
+      run: |
+        palavras_chave=("alter table ab.abcd") 
+        label="bug"  
+
+        adicionar_label=false
+
+        for file in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+          conteudo=$(cat $file)
+          for palavra_chave in "${palavras_chave[@]}"; do
+            if [[ $conteudo == *"$palavra_chave"* ]]; then
+              adicionar_label=true
+              break
+            fi
+          done
+          if [ "$adicionar_label" == true ]; then
+            break
+          fi
+        done
+
+        echo "::set-output name=adicionar_label::$adicionar_label"
+
+    - name: Adicionar Label se qualquer palavra-chave estiver presente
+      if: steps.verificar-conteudo.outputs.adicionar_label == 'true'
+      run: echo "Adicionando a label..." && gh pr label add ${{ github.event.number }} $label
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
