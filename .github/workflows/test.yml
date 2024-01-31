@@ -4,6 +4,7 @@ on:
   pull_request:
     types:
       - opened
+      - edited
 
 jobs:
   verificar-conteudo:
@@ -15,7 +16,7 @@ jobs:
 
     - name: check content and add label
       run: |
-        palavras_chave=("alter table ab.abcd") 
+        palavras_chave=("alter") 
         label="bug"  
 
         adicionar_label=false
