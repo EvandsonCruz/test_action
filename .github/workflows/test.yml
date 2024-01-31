@@ -32,7 +32,8 @@ jobs:
           fi
         done
 
-        echo "::set-output name=adicionar_label::$adicionar_label"
+    - name: Set output
+    run: echo "{adicionar_label}={$adicionar_label}" >> $GITHUB_OUTPUT
 
     - name: Adicionar Label se qualquer palavra-chave estiver presente
       if: steps.verificar-conteudo.outputs.adicionar_label == 'true'
