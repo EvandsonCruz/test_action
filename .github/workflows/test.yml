@@ -24,14 +24,16 @@ jobs:
           for palavra_chave in "${palavras_chave[@]}"; do
             if [[ $conteudo == *"$palavra_chave"* ]]; then
               adicionar_label=true
+              echo "Palavra-chave encontrada: $palavra_chave"
               break
+            else
+              echo "Palavra-chave não encontrada: $palavra_chave"
             fi
           done
           if [ "$adicionar_label" == true ]; then
             break
           fi
         done
-        echo "$adicionar_label"
 
     - name: Set output
       run: echo "adicionar_label=${adicionar_label}" >> $GITHUB_ENV
