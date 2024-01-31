@@ -36,7 +36,9 @@ jobs:
         done
 
     - name: Conteudo debug
-      run: echo "$conteudo"
+      run: |
+       echo "$conteudo"
+       echo "$adicionar_label"
 
     - name: Set output
       run: echo "adicionar_label=${adicionar_label}" >> $GITHUB_ENV
