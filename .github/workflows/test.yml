@@ -2,9 +2,7 @@ name: check content and add label
 
 on:
   pull_request:
-    types:
-      - opened
-      - edited
+    types: [opened, edited]
 
 jobs:
   verificar-conteudo:
