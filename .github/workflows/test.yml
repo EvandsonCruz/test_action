@@ -21,7 +21,6 @@ jobs:
 
         for file in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
           conteudo=$(cat $file)
-          echo "$conteudo"
           for palavra_chave in "${palavras_chave[@]}"; do
             if [[ $conteudo == *"$palavra_chave"* ]]; then
               adicionar_label=true
@@ -35,6 +34,9 @@ jobs:
             break
           fi
         done
+
+    - name: Conteudo debug
+      run: echo "$conteudo"
 
     - name: Set output
       run: echo "adicionar_label=${adicionar_label}" >> $GITHUB_ENV
