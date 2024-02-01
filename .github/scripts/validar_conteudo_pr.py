@@ -6,7 +6,7 @@ def validar_conteudo_pr():
     encontrada = False
 
     # Listar arquivos modificados no PR
-    arquivos_modificados = os.popen("git diff --name-only ${{ github.event.before }} ${{ github.sha }}").read().splitlines()
+    arquivos_modificados = os.popen("git diff --name-only {} {}".format(os.getenv('GITHUB_SHA'), os.getenv('GITHUB_BASE_REF') or 'origin/main')).read().splitlines()
 
     for arquivo in arquivos_modificados:
         with open(arquivo, 'r', encoding='utf-8') as f:
