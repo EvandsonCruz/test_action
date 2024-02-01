@@ -1,4 +1,4 @@
-name: Validar Palavras no Conteúdo do PR
+name: Validar Palavra no Meio da Linha do Conteúdo do PR
 
 on:
   pull_request:
@@ -7,15 +7,32 @@ on:
       - synchronize
 
 jobs:
-  check_pr:
+  validar-conteudo:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Check PR
-      uses: JJ/github-pr-contains-action@releases/v11
-      with:
-        github-token: ${{github.token}}
-        bodyDoesNotContain: "alter"
-        bodyContains: 'alter'
-        diffContains: ';'
-        filesChanged: 1
-        linesChanged: 1
+      - name: Checkout do código
+        uses: actions/checkout@v2
+
+      - name: Validar Palavra no Meio da Linha
+        run: |
+          palavra_chave="alter"  # Substitua com a palavra-chave desejada
+          encontradas=()
+
+          for file in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+            while IFS= read -r linha; do
+              if [[ $linha == *"$palavra_chave"* ]]; then
+                encontradas+=("'$palavra_chave' encontrada no arquivo '$file' na linha: $linha")
+              fi
+            done < "$file"
+          done
+
+          if [ ${#encontradas[@]} -gt 0 ]; then
+            echo "Palavra encontrada no meio da linha nos seguintes lugares:"
+            for encontrada in "${encontradas[@]}"; do
+              echo "- $encontrada"
+            done
+            exit 1
+          else
+            echo "Nenhuma ocorrência da palavra '$palavra_chave' no meio da linha nos arquivos do PR."
+          fi
