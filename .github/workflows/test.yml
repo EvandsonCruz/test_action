@@ -7,33 +7,14 @@ on:
       - synchronize
 
 jobs:
-  validar-conteudo:
+  check_pr:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v2
-
-      - name: Validar Palavras no Conteúdo do PR
-        run: |
-          palavras_chave=("alter")  # Substitua com a lista de palavras-chave desejada
-          encontradas=()
-
-          for file in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-            conteudo=$(cat $file)
-            for palavra_chave in "${palavras_chave[@]}"; do
-              if [[ $conteudo == *"$palavra_chave"* ]]; then
-                encontradas+=("$palavra_chave no arquivo $file")
-              fi
-            done
-          done
-
-          if [ ${#encontradas[@]} -gt 0 ]; then
-            echo "Palavras encontradas nos seguintes arquivos:"
-            for encontrada in "${encontradas[@]}"; do
-              echo "- $encontrada"
-            done
-            exit 1
-          else
-            echo "Nenhuma palavra-chave encontrada nos arquivos do PR."
-          fi
+    - name: Check PR
+      uses: JJ/github-pr-contains-action@releases/v11
+      with:
+        github-token: ${{github.token}}
+        bodyContains: 'alter'
+        diffContains: ';'
+        filesChanged: 1
+        linesChanged: 1
