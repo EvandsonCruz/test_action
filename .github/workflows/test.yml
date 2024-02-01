@@ -1,4 +1,4 @@
-name: Validar Conteúdo do PR
+name: Verificar Conteúdo do PR por Palavra-chave
 
 on:
   pull_request:
@@ -7,22 +7,26 @@ on:
       - synchronize
 
 jobs:
-  validar-conteudo:
+  verificar-conteudo:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout do código
-      uses: actions/checkout@v2
+      - name: Checkout do código
+        uses: actions/checkout@v2
 
-    - name: Configurar Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+      - name: Verificar Conteúdo do PR
+        run: |
+          palavra_chave="alter"  # Substitua pela palavra que você deseja verificar
+          encontrada=false
 
-    - name: Instalar dependências
-      run: |
-        python -m pip install --upgrade pip
-        pip install PyYAML  # ou qualquer outra biblioteca necessária
+          for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+            if grep -q $palavra_chave $arquivo; then
+              echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
+              encontrada=true
+            fi
+          done
 
-    - name: Validar Conteúdo do PR
-      run: python .github/scripts/validar_conteudo_pr.py
+          if [ "$encontrada" == true ]; then
+            echo "::error::A palavra '$palavra_chave' foi encontrada em um ou mais arquivos. Por favor, remova antes de fazer o merge."
+            exit 1
+          fi
