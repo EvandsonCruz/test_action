@@ -1,4 +1,4 @@
-name: Verificar Conteúdo do PR por Palavra-chave
+name: Validar Palavras no Conteúdo do PR
 
 on:
   pull_request:
@@ -7,26 +7,33 @@ on:
       - synchronize
 
 jobs:
-  verificar-conteudo:
+  validar-conteudo:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v2
 
-      - name: Verificar Conteúdo do PR
+      - name: Validar Palavras no Conteúdo do PR
         run: |
-          palavra_chave="alter"  # Substitua pela palavra que você deseja verificar
-          encontrada=false
+          palavras_chave=("alter")  # Substitua com a lista de palavras-chave desejada
+          encontradas=()
 
-          for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-            if grep -q $palavra_chave $arquivo; then
-              echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
-              encontrada=true
-            fi
+          for file in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+            conteudo=$(cat $file)
+            for palavra_chave in "${palavras_chave[@]}"; do
+              if [[ $conteudo == *"$palavra_chave"* ]]; then
+                encontradas+=("$palavra_chave no arquivo $file")
+              fi
+            done
           done
 
-          if [ "$encontrada" == true ]; then
-            echo "::error::A palavra '$palavra_chave' foi encontrada em um ou mais arquivos. Por favor, remova antes de fazer o merge."
+          if [ ${#encontradas[@]} -gt 0 ]; then
+            echo "Palavras encontradas nos seguintes arquivos:"
+            for encontrada in "${encontradas[@]}"; do
+              echo "- $encontrada"
+            done
             exit 1
+          else
+            echo "Nenhuma palavra-chave encontrada nos arquivos do PR."
           fi
