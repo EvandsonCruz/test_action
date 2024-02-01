@@ -1,50 +1,28 @@
-name: check content and add label
+name: Validar Conteúdo do PR
 
 on:
   pull_request:
-    types: [opened, edited]
+    types:
+      - opened
+      - synchronize
 
 jobs:
-  verificar-conteudo:
+  validar-conteudo:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout do código
       uses: actions/checkout@v2
 
-    - name: check content and add label
+    - name: Configurar Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Instalar dependências
       run: |
-        palavras_chave=("alter") 
-        label="bug"  
+        python -m pip install --upgrade pip
+        pip install PyYAML  # ou qualquer outra biblioteca necessária
 
-        adicionar_label=false
-
-        for file in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-          conteudo=$(cat $file)
-          for palavra_chave in "${palavras_chave[@]}"; do
-            if [[ $conteudo == *"$palavra_chave"* ]]; then
-              adicionar_label=true
-              echo "Palavra-chave encontrada: $palavra_chave"
-              break
-            else
-              echo "Palavra-chave não encontrada: $palavra_chave"
-            fi
-          done
-          if [ "$adicionar_label" == true ]; then
-            break
-          fi
-        done
-
-    - name: Conteudo debug
-      run: |
-       echo "$conteudo"
-       echo "$adicionar_label"
-
-    - name: Set output
-      run: echo "adicionar_label=${adicionar_label}" >> $GITHUB_ENV
-
-    - name: Adicionar Label se qualquer palavra-chave estiver presente
-      if: env.adicionar_label == 'true'
-      run: echo "Adicionando a label..." && gh pr label add ${{ github.event.number }} $label
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Validar Conteúdo do PR
+      run: python .github/scripts/validar_conteudo_pr.py
