@@ -14,6 +14,7 @@ jobs:
       uses: JJ/github-pr-contains-action@releases/v11
       with:
         github-token: ${{github.token}}
+        bodyDoesNotContain: "alter"
         bodyContains: 'alter'
         diffContains: ';'
         filesChanged: 1
