@@ -52,7 +52,9 @@ jobs:
           fi
 
       - name: Notificar Slack
-        if: success()
         run: |
-          SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}"
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          if [ "$encontrada" == true ]; then
+            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}"
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+            exit 0
+          fi
