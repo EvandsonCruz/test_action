@@ -23,6 +23,7 @@ jobs:
         for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
           echo "Verificando arquivo: $arquivo"
           conteudo_arquivo=$(cat "$arquivo")
+          echo "Conteudo do arquivo: $conteudo_arquivo"
 
           if echo "$conteudo_arquivo" | grep -q "$palavra_a_validar"; then
             echo "Palavra 'alter' encontrada no conteúdo do arquivo: $arquivo"
