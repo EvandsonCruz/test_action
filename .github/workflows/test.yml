@@ -19,6 +19,9 @@ jobs:
         palavra_a_validar="alter"
         palavra_encontrada=false
 
+        echo ">>>>>>>>>>>>>>: $palavra_a_validar"
+        echo ">>>>>>>>>>>>>>: $palavra_encontrada"
+
         # Iterar sobre todos os arquivos no PR
         for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
           echo "Verificando arquivo: $palavra_a_validar"
@@ -30,6 +33,9 @@ jobs:
             palavra_encontrada=true
           fi
         done
+
+        echo ">>>>>>>>>>>>>>: $palavra_a_validar"
+        echo ">>>>>>>>>>>>>>: $palavra_encontrada"
 
         # Verificar se a palavra foi encontrada em algum arquivo
         if [ "$palavra_encontrada" = true ]; then
