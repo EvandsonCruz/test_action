@@ -31,15 +31,14 @@ jobs:
     - name: Imprimir Lista de Arquivos Modificados
       run: |
         echo "Lista de arquivos modificados:"
-        git diff --name-only ${{ github.event.before }} ${{ github.sha }}
-
+        git diff --name-only HEAD^ HEAD
     - name: Validar Palavra "alter"
       run: |
         palavra_a_validar="alter"
         palavra_encontrada=false
 
         # Iterar sobre todos os arquivos no PR
-        for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+        for arquivo in $(git diff --name-only HEAD^ HEAD); do
           echo "Verificando arquivo: $arquivo"
           conteudo_arquivo=$(cat "$arquivo")
           
