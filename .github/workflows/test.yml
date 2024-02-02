@@ -34,6 +34,9 @@ jobs:
           fi
         done
 
+        echo ">>>>>>>>>>>>>>: $conteudo_arquivo"
+        echo ">>>>>>>>>>>>>>: $arquivo"
+
         echo ">>>>>>>>>>>>>>: $palavra_a_validar"
         echo ">>>>>>>>>>>>>>: $palavra_encontrada"
 
