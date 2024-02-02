@@ -21,7 +21,8 @@ jobs:
 
         # Iterar sobre todos os arquivos modificados no pull request
         for arquivo_modificado in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-          if grep -q "$palavra_a_validar" "$arquivo_modificado"; then
+          # Usar awk para procurar a palavra na linha
+          if awk -v palavra="$palavra_a_validar" 'BEGIN {IGNORECASE=1} $0 ~ palavra {exit 0} END {exit 1}' "$arquivo_modificado"; then
             echo "Palavra encontrada no arquivo: $arquivo_modificado"
             palavra_encontrada=true
           fi
