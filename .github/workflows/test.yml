@@ -34,7 +34,7 @@ jobs:
           done
 
           if [ "$encontrada" == true ]; then
-            echo "::error::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
+            echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
             gh pr edit ${{ github.event.number }} --add-label bug
             exit 0
           fi
