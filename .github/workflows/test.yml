@@ -26,7 +26,7 @@ jobs:
           palavras_chave=("alter table" "drop package")  # Substitua pela lista de palavras-chave desejada
           outras_palavras=("ab.teste")  # Substitua pela segunda lista de palavras 
 
-          encontrada=false >> $GITHUB_ENV
+          encontrada=false
           #output=""
 
           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
@@ -48,6 +48,7 @@ jobs:
           
       - name: Add label
         run: |
+          echo "!!!!!!!!!!!!!!!!!!!!!!!! '$encontrada'"
           if [ "$encontrada" == true ]; then
             echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
             gh pr edit ${{ github.event.number }} --add-label bug
