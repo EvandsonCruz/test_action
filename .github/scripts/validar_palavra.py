@@ -10,6 +10,9 @@ def validar_palavra(palavra_chave, arquivos):
             for numero_linha, linha in enumerate(f.readlines(), start=1):
                 if palavra_chave in linha:
                     encontradas.append(f"'{palavra_chave}' encontrada no arquivo '{arquivo}' na linha {numero_linha}: {linha.strip()}")
+                    print("Palavra-chave:", palavra_chave)
+                    print("Arquivos modificados:", arquivos_modificados)
+
 
     return encontradas
 
