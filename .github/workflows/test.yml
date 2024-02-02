@@ -39,7 +39,9 @@ jobs:
         done
 
         
-
+        echo "$GITHUB_OUTPUT"
+        echo "$GITHUB_OUTPUT"
+        echo "$GITHUB_OUTPUT"
         echo ">>>>>>>>>>>>>>: $palavra_a_validar"
         echo ">>>>>>>>>>>>>>: $palavra_encontrada"
 
