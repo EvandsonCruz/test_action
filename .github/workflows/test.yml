@@ -31,6 +31,7 @@ jobs:
           done
 
           if [ "$encontrada" == true ]; then
-            echo "::error::Uma ou mais palavras-chave foram encontradas nos arquivos. Por favor, remova antes de fazer o merge."
+            echo "::error::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
+            gh pr label add ${{ github.event.number }} bug
             exit 1
           fi
