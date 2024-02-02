@@ -1,4 +1,4 @@
-name: Validar Palavra "alter" no Conteúdo do PR
+name: Validar Presença da Palavra "alter" no Meio da Linha do Conteúdo do PR
 
 on:
   pull_request:
@@ -7,40 +7,16 @@ on:
       - synchronize
 
 jobs:
-  validar-palavra-no-pr:
+  validar-conteudo:
     runs-on: ubuntu-latest
 
-    outputs:
-      id: result
-      value: ${{ steps.set-output.outputs }}
-
     steps:
-    - name: Checkout do Código
-      uses: actions/checkout@v2
+      - name: Checkout do código
+        uses: actions/checkout@v2
 
-    - name: Validar Palavra "alter"
-      id: set-output
-      run: |
-        palavra_a_validar="alter"
-        palavra_encontrada=false
+      - name: Validar Presença da Palavra "alter" no Meio da Linha
+        run: |
+          palavra_chave="alter"
+          arquivos_modificados=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
 
-        # Iterar sobre todos os arquivos no PR
-        for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-          echo "Verificando arquivo: $arquivo"
-          conteudo_arquivo=$(cat "$arquivo")
-
-          if echo "$conteudo_arquivo" | grep -q "$palavra_a_validar"; then
-            echo "Palavra 'alter' encontrada no conteúdo do arquivo: $arquivo"
-            echo "::set-output name=conteudo_arquivo::$conteudo_arquivo"
-            echo "::set-output name=arquivo::$arquivo"
-            palavra_encontrada=true
-          fi
-        done
-
-        # Verificar se a palavra foi encontrada em algum arquivo
-        if [ "$palavra_encontrada" = true ]; then
-          echo "Palavra 'alter' encontrada em pelo menos um arquivo."
-        else
-          echo "Erro: Palavra 'alter' não encontrada no conteúdo de nenhum arquivo no PR."
-          exit 1
-        fi
+          python .github/scripts/validar_palavra.py "$palavra_chave" $arquivos_modificados
