@@ -11,46 +11,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Imprimir Variáveis de Ambiente
-      run: |
-        echo "GitHub Event:"
-        echo "${{ toJson(github.event) }}"
-        echo "GitHub SHA: ${{ github.sha }}"
-        echo "GitHub Event Before: ${{ github.event.before }}"
-        echo "GitHub Event After: ${{ github.event.after }}"
-        echo "GitHub Event Action: ${{ github.event.action }}"
-        echo "GitHub Event Pull Request Title: ${{ github.event.pull_request.title }}"
-        echo "GitHub Event Pull Request Number: ${{ github.event.pull_request.number }}"
-        echo "GitHub Event Pull Request Base Ref: ${{ github.event.pull_request.base.ref }}"
-        echo "GitHub Event Pull Request Head Ref: ${{ github.event.pull_request.head.ref }}"
-        echo "GitHub Event Repository: ${{ github.event.repository.full_name }}"
-
     - name: Checkout do Código
       uses: actions/checkout@v2
 
-    - name: Imprimir Lista de Arquivos Modificados
-      run: |
-        echo "Lista de arquivos modificados:"
-        git diff --name-only HEAD^ HEAD
     - name: Validar Palavra "alter"
       run: |
         palavra_a_validar="alter"
         palavra_encontrada=false
 
         # Iterar sobre todos os arquivos no PR
-        for arquivo in $(git diff --name-only HEAD^ HEAD); do
+        for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
           echo "Verificando arquivo: $arquivo"
           conteudo_arquivo=$(cat "$arquivo")
-          
+
           if echo "$conteudo_arquivo" | grep -q "$palavra_a_validar"; then
             echo "Palavra 'alter' encontrada no conteúdo do arquivo: $arquivo"
             palavra_encontrada=true
           fi
-
-          # Imprimir valores das variáveis após cada iteração
-          echo "Valor de palavra_encontrada: $palavra_encontrada"
-          echo "Valor de conteudo_arquivo: $conteudo_arquivo"
-          echo "Valor de arquivo: $arquivo"
         done
 
         # Verificar se a palavra foi encontrada em algum arquivo
