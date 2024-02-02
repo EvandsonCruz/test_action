@@ -27,6 +27,8 @@ jobs:
           echo "Verificando arquivo: $palavra_a_validar"
           conteudo_arquivo=$(cat "$arquivo")
           echo "Conteudo do arquivo: $palavra_encontrada"
+          echo ">>>>>>>>>>>>>>: $conteudo_arquivo"
+          echo ">>>>>>>>>>>>>>: $arquivo"
 
           if echo "$conteudo_arquivo" | grep -q "$palavra_a_validar"; then
             echo "Palavra 'alter' encontrada no conteúdo do arquivo: $arquivo"
@@ -34,8 +36,7 @@ jobs:
           fi
         done
 
-        echo ">>>>>>>>>>>>>>: $conteudo_arquivo"
-        echo ">>>>>>>>>>>>>>: $arquivo"
+        
 
         echo ">>>>>>>>>>>>>>: $palavra_a_validar"
         echo ">>>>>>>>>>>>>>: $palavra_encontrada"
