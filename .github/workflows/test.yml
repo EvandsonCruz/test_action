@@ -18,17 +18,19 @@ jobs:
 
       - name: Verificar Conteúdo do PR
         run: |
-          palavra_chave="alter"  # Substitua pela palavra que você deseja verificar
+          palavras_chave=("alter" "table" "add")  # Substitua pela lista de palavras-chave desejada
           encontrada=false
 
           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-            if grep -q $palavra_chave $arquivo; then
-              echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
-              encontrada=true
-            fi
+            for palavra_chave in "${palavras_chave[@]}"; do
+              if grep -q "$palavra_chave" "$arquivo"; then
+                echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
+                encontrada=true
+              fi
+            done
           done
 
           if [ "$encontrada" == true ]; then
-            echo "::error::A palavra '$palavra_chave' foi encontrada em um ou mais arquivos. Por favor, remova antes de fazer o merge."
+            echo "::error::Uma ou mais palavras-chave foram encontradas nos arquivos. Por favor, remova antes de fazer o merge."
             exit 1
           fi
