@@ -10,45 +10,36 @@ jobs:
   validar-palavra-no-pr:
     runs-on: ubuntu-latest
 
+    outputs:
+      id: result
+      value: ${{ steps.set-output.outputs }}
+
     steps:
     - name: Checkout do Código
       uses: actions/checkout@v2
 
     - name: Validar Palavra "alter"
+      id: set-output
       run: |
         palavra_a_validar="alter"
         palavra_encontrada=false
 
-        echo ">>>>>>>>>>>>>>: $palavra_a_validar"
-        echo ">>>>>>>>>>>>>>: $palavra_encontrada"
-
         # Iterar sobre todos os arquivos no PR
         for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-          echo "Verificando arquivo: $palavra_a_validar"
+          echo "Verificando arquivo: $arquivo"
           conteudo_arquivo=$(cat "$arquivo")
-          echo "Conteudo do arquivo: $palavra_encontrada"
-          echo ">>>>>>>>>>>>>>: $conteudo_arquivo" >> $GITHUB_OUTPUT
-          echo "$GITHUB_OUTPUT"
-          echo ">>>>>>>>>>>>>>: $arquivo" >> $GITHUB_OUTPUT
-          echo "$GITHUB_OUTPUT"
 
           if echo "$conteudo_arquivo" | grep -q "$palavra_a_validar"; then
             echo "Palavra 'alter' encontrada no conteúdo do arquivo: $arquivo"
+            echo "::set-output name=conteudo_arquivo::$conteudo_arquivo"
+            echo "::set-output name=arquivo::$arquivo"
             palavra_encontrada=true
           fi
         done
 
-        
-        echo "$GITHUB_OUTPUT"
-        echo "$GITHUB_OUTPUT"
-        echo "$GITHUB_OUTPUT"
-        echo ">>>>>>>>>>>>>>: $palavra_a_validar"
-        echo ">>>>>>>>>>>>>>: $palavra_encontrada"
-
         # Verificar se a palavra foi encontrada em algum arquivo
         if [ "$palavra_encontrada" = true ]; then
           echo "Palavra 'alter' encontrada em pelo menos um arquivo."
-          exit 0
         else
           echo "Erro: Palavra 'alter' não encontrada no conteúdo de nenhum arquivo no PR."
           exit 1
