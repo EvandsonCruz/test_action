@@ -21,15 +21,23 @@ jobs:
 
       - name: Verificar Conteúdo do PR
         run: |
-          palavras_chave=("alter" "table" "add")  # Substitua pela lista de palavras-chave desejada
+          palavras_chave=("alter table" "drop package")  # Substitua pela lista de palavras-chave desejada
+          outras_palavras=("ab.abcd")  # Substitua pela segunda lista de palavras
+
           encontrada=false
 
           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
             for palavra_chave in "${palavras_chave[@]}"; do
               if grep -q "$palavra_chave" "$arquivo"; then
                 echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
-                encontrada=true
-              fi
+                # Verificar também se alguma palavra da segunda lista está presente no mesmo arquivo
+                for outra_palavra in "${outras_palavras[@]}"; do
+                  if grep -q "$outra_palavra" "$arquivo"; then
+                    echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
+                    encontrada=true
+                  fi
+                  done
+                 fi
             done
           done
 
