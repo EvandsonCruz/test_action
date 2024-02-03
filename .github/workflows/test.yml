@@ -37,7 +37,24 @@ jobs:
 
           echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
           #echo ">>>>>>>>>>>>>>>>>>>> $saida"
-
+          
+          if [ "${{ github.event_name }}" == "opened" ]; then
+             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+             for arquivo in $(git diff --name-only ${{ github.sha }}); do
+               for palavra_chave in "${palavras_chave[@]}"; do
+                  if grep -q "$palavra_chave" "$arquivo"; then
+                  echo "Encontrada a palavra '$palavra_chave' no novo arquivo: $arquivo"
+                  for outra_palavra in "${outras_palavras[@]}"; do
+                   if grep -q "$outra_palavra" "$arquivo"; then
+                    echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
+                    encontrada=true
+                    saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                   fi
+                 done
+               fi
+               done
+              done
+          else 
           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
             for palavra_chave in "${palavras_chave[@]}"; do
               if grep -q "$palavra_chave" "$arquivo"; then
