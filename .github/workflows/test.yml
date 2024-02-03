@@ -38,17 +38,14 @@ jobs:
                   if grep -q "$outra_palavra" "$arquivo"; then
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
                     encontrada=true
-                    #echo "encontrada=$encontrada" >> $GITHUB_ENV
+                    echo "encontrada=$encontrada" >> $GITHUB_ENV
                     output="$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                    #echo "output=$output" >> $GITHUB_ENV
+                    echo "output=$output" >> $GITHUB_ENV
                   fi
                   done
                  fi
             done
           done
-
-          echo "encontrada=$encontrada" >> $GITHUB_ENV
-          echo "output=$output" >> $GITHUB_ENV
           
       - name: Add label
         run: |
