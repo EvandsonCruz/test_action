@@ -36,6 +36,7 @@ jobs:
           saida=""
 
           echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
+          echo "#############################################################  ${{ github.event_name }}"
           
           if [ "${{ github.event_name }}" == "opened" ]; then
             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
