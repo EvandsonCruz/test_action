@@ -44,6 +44,7 @@ jobs:
 
             # Obtém a lista de arquivos adicionados no pull request
             arquivos_adicionados=($(git diff --name-only --diff-filter=A /dev/null "${{ github.sha }}"))
+            echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
 
             for arquivo in "${arquivos_adicionados[@]}"; do
               echo "Novo arquivo adicionado: $arquivo"
