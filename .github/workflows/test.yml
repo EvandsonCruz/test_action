@@ -51,7 +51,7 @@ jobs:
           echo "!!!!!!!!!!!!!!!!!!!!!!!! '$encontrada'"
           echo "!!!!!!!!!!!!!!!!!!!!!!!! '$saida'"
           if [ true == true ]; then
-            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n$saida"
+            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
            exit 0
           fi
