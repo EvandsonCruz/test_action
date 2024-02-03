@@ -1,1 +1,1 @@
-alter table ab.teste add col2 date; 
+alter table ab.ab add col2 date; 
