@@ -27,7 +27,7 @@ jobs:
           palavras_chave=("alter table" "drop package")  # Substitua pela lista de palavras-chave desejada
           outras_palavras=("ab.teste")  # Substitua pela segunda lista de palavras 
 
-          echo "export encontrada=false" >> $GITHUB_ENV
+          encontrada=false
           saida=""
 
           echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
@@ -41,7 +41,8 @@ jobs:
                 for outra_palavra in "${outras_palavras[@]}"; do
                   if grep -q "$outra_palavra" "$arquivo"; then
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                    echo "export encontrada=true" >> $GITHUB_ENV
+                    encontrada=true
+                    echo ">>>>>>>depois do true>>>>>>>>>>>>> $encontrada"
                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
                   fi
                 done
