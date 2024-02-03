@@ -30,7 +30,7 @@ jobs:
       - name: Verificar Conteúdo do PR
         run: |
           palavras_chave=("alter table" "drop package")  # Substitua pela lista de palavras-chave desejada
-          outras_palavras=("ab.teste")  # Substitua pela segunda lista de palavras 
+          outras_palavras=("ab.teste" "ab.dois")  # Substitua pela segunda lista de palavras 
 
           encontrada=false 
           saida=""
