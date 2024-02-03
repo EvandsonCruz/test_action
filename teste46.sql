@@ -1,1 +1,1 @@
-alter table teste add col2 date; 
+alter table teste add col2 date;  
