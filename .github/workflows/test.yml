@@ -16,6 +16,7 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v2
         with:
+          ref: ${{ github.event.before }} # Use a referência antes do commit do pull request
           fetch-depth: 0
 
       - name: Configurar variável de ambiente GH_TOKEN
