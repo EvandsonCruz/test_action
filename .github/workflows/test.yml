@@ -16,7 +16,7 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v2
         with:
-         fetch-depth: 0
+          fetch-depth: 0
 
       - name: Configurar variável de ambiente GH_TOKEN
         run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV   
@@ -26,8 +26,8 @@ jobs:
           palavras_chave=("alter table" "drop package")  # Substitua pela lista de palavras-chave desejada
           outras_palavras=("ab.teste")  # Substitua pela segunda lista de palavras 
 
-          echo "encontrada=false" >> $GITHUB_ENV
-          echo "saida=" >> $GITHUB_ENV
+          encontrada=false
+          saida=""
 
           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
             for palavra_chave in "${palavras_chave[@]}"; do
@@ -37,23 +37,22 @@ jobs:
                 for outra_palavra in "${outras_palavras[@]}"; do
                   if grep -q "$outra_palavra" "$arquivo"; then
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                    echo "encontrada=true" >> $GITHUB_ENV
+                    encontrada=true
                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                    #saida="$saida" >> $GITHUB_ENV
-                    echo "***************encontrada************************* ${{ env.encontrada }}"
+                    echo "***************encontrada************************* $encontrada"
                     echo "*******************saida********************* $saida"
-                    #echo "output=$output" >> $GITHUB_ENV
                   fi
-                  done
-                 fi
+                done
+              fi
             done
           done
+
           echo "!!!!!!!!!!!!!!!!!!!!!!!! '$encontrada'"
           echo "!!!!!!!!!!!!!!!!!!!!!!!! '$saida'"
-          if [ $encontrada == true ]; then
+          if [ "$encontrada" == true ]; then
             SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-           exit 0
+            exit 0
           fi
           
       - name: Add label
@@ -71,5 +70,5 @@ jobs:
           if [ "$encontrada" == true ]; then
             SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-           exit 0
+            exit 0
           fi
