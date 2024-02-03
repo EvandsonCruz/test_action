@@ -48,20 +48,25 @@ jobs:
                  fi
             done
           done
+          if [ "$encontrada" == true ]; then
+            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n$saida"
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+           exit 0
+          fi
           
-      
+      - name: Add label
+        run: |
           echo "!!!!!!!!!!!!!!!!!!!!!!!! '$saida'"
           if [ "$encontrada" == true ]; then
             echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
             gh pr edit ${{ github.event.number }} --add-label bug
-            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n$saida"
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
             exit 0
           fi
 
-      
-         # if [ "$encontrada" == true ]; then
-         #   SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n$saida"
-         #   curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-         #  exit 0
-         # fi
+      - name: Notificar slack
+        run: |
+          if [ "$encontrada" == true ]; then
+            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n$saida"
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+           exit 0
+          fi
