@@ -37,8 +37,7 @@ jobs:
                 for outra_palavra in "${outras_palavras[@]}"; do
                   if grep -q "$outra_palavra" "$arquivo"; then
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                    echo "encontrada=true" >> $GITHUB_ENV
-                    echo "encontrada=$encontrada" >> $GITHUB_ENV
+                    echo "{encontrada}={true}" >> $GITHUB_OUTPUT
                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n" >> $GITHUB_ENV
                     saida="$saida" >> $GITHUB_ENV
                     echo "**************************************** $saida"
