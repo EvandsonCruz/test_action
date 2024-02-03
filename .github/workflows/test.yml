@@ -27,7 +27,7 @@ jobs:
           outras_palavras=("ab.teste")  # Substitua pela segunda lista de palavras 
 
           echo "encontrada=false" >> $GITHUB_ENV
-          #echo "output=''" >> $GITHUB_ENV
+          echo "saida=''" >> $GITHUB_ENV
 
           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
             for palavra_chave in "${palavras_chave[@]}"; do
@@ -39,8 +39,8 @@ jobs:
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
                     echo "encontrada=true" >> $GITHUB_ENV
                     #echo "encontrada=$encontrada" >> $GITHUB_ENV
-                    output="$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                    output="$output" >> $GITHUB_ENV
+                    saida="$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                    #saida="$saida" >> $GITHUB_ENV
                     echo "**************************************** $output"
                     #echo "output=$output" >> $GITHUB_ENV
                   fi
