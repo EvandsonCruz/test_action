@@ -50,8 +50,9 @@ jobs:
           done
           echo "!!!!!!!!!!!!!!!!!!!!!!!! '$encontrada'"
           echo "!!!!!!!!!!!!!!!!!!!!!!!! '$saida'"
+          branch_name=$(echo "${{ github.ref }}" | sed 's#refs/heads/##')
           if [ true == true ]; then
-            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.ref }})\n$saida"
+            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files ($branch_name)\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
            exit 0
           fi
