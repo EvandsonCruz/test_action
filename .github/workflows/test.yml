@@ -36,55 +36,51 @@ jobs:
           saida=""
 
           echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
-          #echo ">>>>>>>>>>>>>>>>>>>> $saida"
           
           if [ "${{ github.event_name }}" == "opened" ]; then
-             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
-             for arquivo in $(git diff --name-only ${{ github.sha }}); do
-               for palavra_chave in "${palavras_chave[@]}"; do
-                  if grep -q "$palavra_chave" "$arquivo"; then
+            echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+            for arquivo in $(git diff --name-only ${{ github.sha }}); do
+              for palavra_chave in "${palavras_chave[@]}"; do
+                if grep -q "$palavra_chave" "$arquivo"; then
                   echo "Encontrada a palavra '$palavra_chave' no novo arquivo: $arquivo"
                   for outra_palavra in "${outras_palavras[@]}"; do
-                   if grep -q "$outra_palavra" "$arquivo"; then
-                    echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                    encontrada=true
-                    saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                   fi
-                 done
-               fi
-               done
+                    if grep -q "$outra_palavra" "$arquivo"; then
+                      echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
+                      encontrada=true
+                      saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                    fi
+                  done
+                fi
               done
-          else 
-          for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-            for palavra_chave in "${palavras_chave[@]}"; do
-              if grep -q "$palavra_chave" "$arquivo"; then
-                echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
-                # Verificar também se alguma palavra da segunda lista está presente no mesmo arquivo
-                for outra_palavra in "${outras_palavras[@]}"; do
-                  if grep -q "$outra_palavra" "$arquivo"; then
-                    echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                    encontrada=true
-                    echo ">>>>>>>depois do true>>>>>>>>>>>>> $encontrada"
-                    saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                  fi
-                done
-              fi
             done
-          done
+          else 
+            for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+              for palavra_chave in "${palavras_chave[@]}"; do
+                if grep -q "$palavra_chave" "$arquivo"; then
+                  echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
+                  for outra_palavra in "${outras_palavras[@]}"; do
+                    if grep -q "$outra_palavra" "$arquivo"; then
+                      echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
+                      encontrada=true
+                      saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                    fi
+                  done
+                fi
+              done
+            done
 
-          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
+            echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
-          if [ "$encontrada" == true ]; then
-            echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
-            gh pr edit ${{ github.event.number }} --add-label bug
+            if [ "$encontrada" == true ]; then
+              echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
+              gh pr edit ${{ github.event.number }} --add-label bug
+            fi
+
+            echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
+
+            if [ "$encontrada" == true ]; then
+              SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+              curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+              exit 0
+            fi
           fi
-
-          echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
-
-          if [ "$encontrada" == true ]; then
-            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-            exit 0
-          fi
-          
-
