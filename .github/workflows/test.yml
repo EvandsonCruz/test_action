@@ -42,6 +42,7 @@ jobs:
                   if grep -q "$outra_palavra" "$arquivo"; then
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
                     encontrada=true
+                    encontrada=$encontrada
                     echo ">>>>>>>depois do true>>>>>>>>>>>>> $encontrada"
                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
                   fi
