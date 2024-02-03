@@ -27,7 +27,7 @@ jobs:
           outras_palavras=("ab.teste")  # Substitua pela segunda lista de palavras 
 
           encontrada=false
-          #output=""
+          output=""
 
           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
             for palavra_chave in "${palavras_chave[@]}"; do
@@ -39,7 +39,8 @@ jobs:
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
                     encontrada=true
                     echo "encontrada=$encontrada" >> $GITHUB_ENV
-                    #output="$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                    output="$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                    echo "output=$output" >> $GITHUB_ENV
                   fi
                   done
                  fi
@@ -58,7 +59,7 @@ jobs:
       - name: Notificar Slack
         run: |
           if [ "$encontrada" == true ]; then
-            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}"
+            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n $output"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
             exit 0
           fi
