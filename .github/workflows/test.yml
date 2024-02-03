@@ -39,7 +39,7 @@ jobs:
           echo "#############################################################  ${{ github.event_name }}"
           echo "##########################opened###################################  ${{ github.event.action }}"
           
-          if [ "${{ github.event_name }}" == "opened" ]; then
+          if [ "${{ github.event.action }}" == "opened" ]; then
             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
             # Obtém a lista de arquivos adicionados no pull request
