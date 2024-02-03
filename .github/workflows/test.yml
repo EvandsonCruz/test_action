@@ -40,7 +40,7 @@ jobs:
                     echo "encontrada=true" >> $GITHUB_ENV
                     #echo "encontrada=$encontrada" >> $GITHUB_ENV
                     saida="$saida $palavra_chave no objeto $outra_palavra no arquivo $arquivo\n" >> $GITHUB_ENV
-                    #saida="$saida" >> $GITHUB_ENV
+                    saida="$saida" >> $GITHUB_ENV
                     echo "**************************************** $saida"
                     #echo "output=$output" >> $GITHUB_ENV
                   fi
