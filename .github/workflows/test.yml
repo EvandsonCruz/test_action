@@ -26,8 +26,8 @@ jobs:
           palavras_chave=("alter table" "drop package")  # Substitua pela lista de palavras-chave desejada
           outras_palavras=("ab.teste")  # Substitua pela segunda lista de palavras 
 
-          encontrada=false
-          output=""
+          echo "encontrada=false" >> $GITHUB_ENV
+          echo "output=''" >> $GITHUB_ENV
 
           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
             for palavra_chave in "${palavras_chave[@]}"; do
@@ -38,9 +38,9 @@ jobs:
                   if grep -q "$outra_palavra" "$arquivo"; then
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
                     encontrada=true
-                    echo "encontrada=$encontrada" >> $GITHUB_ENV
+                    #echo "encontrada=$encontrada" >> $GITHUB_ENV
                     output="$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                    echo "output=$output" >> $GITHUB_ENV
+                    #echo "output=$output" >> $GITHUB_ENV
                   fi
                   done
                  fi
