@@ -1,1 +1,1 @@
-drop package ab.ab;
+drop package ab.teste;
