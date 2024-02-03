@@ -39,36 +39,22 @@ jobs:
                     echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
                     encontrada=true
                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                    echo "***************encontrada************************* $encontrada"
-                    echo "*******************saida********************* $saida"
                   fi
                 done
               fi
             done
           done
 
-          echo "!!!!!!!!!!!!!!!!!!!!!!!! '$encontrada'"
-          echo "!!!!!!!!!!!!!!!!!!!!!!!! '$saida'"
-          if [ "$encontrada" == true ]; then
-            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-            exit 0
-          fi
-          
-      - name: Add label
-        run: |
-          echo "!!!!!!!!!!!!Add label!!!!!!!!!!!! '$saida'"
           if [ "$encontrada" == true ]; then
             echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
             gh pr edit ${{ github.event.number }} --add-label bug
             exit 0
           fi
 
-      - name: Notificar slack
-        run: |
-          echo "!!!!!!!!!!!Notificar slack!!!!!!!!!!!!! '$saida'"
           if [ "$encontrada" == true ]; then
-            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - ${GITHUB_REPOSITORY}/pull/${{ github.event.number }}\n$saida"
+            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
             exit 0
           fi
+          
+
