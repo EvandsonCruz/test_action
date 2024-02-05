@@ -1,0 +1,96 @@
+name: Validar Presença da Palavra "alter" no Meio da Linha do Conteúdo do PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths-ignore:
+      - '.github/workflows/**'
+
+jobs:
+  validar-conteudo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Configurar variável de ambiente GH_TOKEN
+        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
+
+      - name: Imprimir alterações
+        run: |
+          echo "Referência antes do evento: ${{ github.event.before }}"
+          echo "SHA do commit atual: ${{ github.sha }}"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }}  
+
+      - name: Verificar Conteúdo do PR
+        run: |
+          palavras_chave=("grant")  # Substitua pela lista de palavras-chave desejada
+          outras_palavras=("to public")  # Substitua pela segunda lista de palavras 
+
+          encontrada=false 
+          saida=""
+
+          echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
+          echo "#############################################################  ${{ github.event_name }}"
+          echo "##########################opened###################################  ${{ github.event.action }}"
+          
+          if [ "${{ github.event.action }}" == "opened" ]; then
+            echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+
+            # Obtém a lista de arquivos adicionados no pull request
+            arquivos_adicionados=($(git diff --name-only HEAD^1))
+            echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
+
+            for arquivo in "${arquivos_adicionados[@]}"; do
+              echo "Novo arquivo adicionado: $arquivo"
+
+              # Restante do seu código para verificar palavras-chave e outras_palavras
+              for palavra_chave in "${palavras_chave[@]}"; do
+                if grep -q "$palavra_chave" "$arquivo"; then
+                  echo "Encontrada a palavra '$palavra_chave' no novo arquivo: $arquivo"
+                  for outra_palavra in "${outras_palavras[@]}"; do
+                    if grep -q "$outra_palavra" "$arquivo"; then
+                      echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
+                      encontrada=true
+                      saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                    fi
+                  done
+                fi
+              done
+            done
+          else 
+            for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+              for palavra_chave in "${palavras_chave[@]}"; do
+                if grep -q "$palavra_chave" "$arquivo"; then
+                  echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
+                  for outra_palavra in "${outras_palavras[@]}"; do
+                    if grep -q "$outra_palavra" "$arquivo"; then
+                      echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
+                      encontrada=true
+                      saida="$saida$palavra_chave $outra_palavra no arquivo $arquivo\n"
+                    fi
+                  done
+                fi
+              done
+            done
+          fi
+          
+          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
+
+          if [ "$encontrada" == true ]; then
+            echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
+            gh pr edit ${{ github.event.number }} --add-label bug
+          fi
+
+          echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
+
+          if [ "$encontrada" == true ]; then
+            SLACK_MESSAGE="Label 'bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+            exit 0
+          fi
