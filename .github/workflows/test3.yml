@@ -28,7 +28,7 @@ jobs:
     - name: Verificar extensão de arquivos
       run: |
         tem_erro=false
-        echo saida="" >> $GITHUB_ENV
+        saida=""
 
         for arquivo in $(cat files.txt); do
           if [[ -f "$arquivo" || "$arquivo" != *.* ]]; then
@@ -42,7 +42,7 @@ jobs:
 
         if [ "$tem_erro" = true ]; then
           echo "Enviando notificação para o Slack..."
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ter extensão.\n'"${{ saida }}"'}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ter extensão.\n'$(cat $saida)'}' ${{ secrets.SLACK_WEBHOOK_URL }}
           exit 1
         else
           echo "Todos os arquivos tem extensão."
