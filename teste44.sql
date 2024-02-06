@@ -1,4 +1,6 @@
-alter table ab.teste add col1 number  
+drop package ab.teste
 /
-grant select on ab.teste to public
+create package ab.teste
+/
+grant execute on ab.teste to public
 /
