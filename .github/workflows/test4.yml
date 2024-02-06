@@ -24,9 +24,9 @@ jobs:
       id: obter-conteudo
       run: |
         if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
-          conteudo_pr=$(git diff --cached -U0 | grep -E '^\\+')
+          conteudo_pr=($(git diff --name-only HEAD^1))
         else
-          conteudo_pr=$(git diff --cached -U0 ${{ github.event.before }} ${{ github.sha }} | grep -E '^\\+')
+          conteudo_pr=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
         fi
 
     - name: Verificar trecho de 31 caracteres após um ponto
