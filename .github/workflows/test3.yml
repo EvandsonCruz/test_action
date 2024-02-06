@@ -34,8 +34,8 @@ jobs:
 
         if [ "$tem_erro" = true ]; then
           echo "Enviando notificação para o Slack..."
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ser sem extensão."}' $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ser sem extensão."}' ${{ secrets.SLACK_WEBHOOK_URL }}
           exit 1
         else
-          echo "Todos os arquivos estão sem extensão."
+          echo "Todos os arquivos tem extensão."
         fi
