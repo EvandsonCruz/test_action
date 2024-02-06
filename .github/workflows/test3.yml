@@ -28,7 +28,7 @@ jobs:
     - name: Verificar extensão de arquivos
       run: |
         tem_erro=false
-        saida=""
+        echo saida="" >> $GITHUB_ENV
 
         for arquivo in $(cat files.txt); do
           if [[ -f "$arquivo" || "$arquivo" != *.* ]]; then
