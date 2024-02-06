@@ -23,13 +23,8 @@ jobs:
     - name: Listar arquivos do pull request
       id: listar-arquivos
       run: |
-        if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
-          git diff --name-only HEAD^1 > files.txt
-          cat files.txt
-        else
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > files.txt
-          cat files.txt
-        fi
+        git diff --name-only ${{ github.event.before }} ${{ github.sha }} > files.txt
+        cat files.txt
 
     - name: Verificar extensão de arquivos
       run: |
