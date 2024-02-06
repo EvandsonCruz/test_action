@@ -1,0 +1,43 @@
+name: Validar Trecho de 31 Caracteres no Conteúdo do PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+    paths-ignore:
+      - '.github/workflows/**'
+
+jobs:
+  validar-trecho:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Obter conteúdo do pull request
+      id: obter-conteudo
+      run: |
+        if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
+          conteudo_pr=$(git diff --cached -U0 | grep -E '^\\+')
+        else
+          conteudo_pr=$(git diff --cached -U0 ${{ github.event.before }} ${{ github.sha }} | grep -E '^\\+')
+        fi
+
+    - name: Verificar trecho de 31 caracteres após um ponto
+      run: |
+        tem_erro=false
+        saida=""
+
+        if echo "$conteudo_pr" | grep -q -E '\.\S{31}'; then
+          echo "Encontrado um trecho de 31 caracteres contínuos, sem espaços, após um ponto no conteúdo do PR."
+          # Adicione aqui o código ou ações a serem executadas se a condição for verdadeira.
+        else
+          echo "Não encontrado um trecho de 31 caracteres contínuos, sem espaços, após um ponto no conteúdo do PR."
+          # Adicione aqui o código ou ações a serem executadas se a condição for falsa.
+        fi
