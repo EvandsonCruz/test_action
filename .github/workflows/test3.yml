@@ -1,0 +1,41 @@
+name: Validar Extensão de Arquivos no Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  validar_extensao:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Listar arquivos do pull request
+      id: listar_arquivos
+      run: |
+        git diff --name-only ${{ github.event.before }} ${{ github.sha }} > files.txt
+        cat files.txt
+
+    - name: Verificar extensão de arquivos
+      run: |
+        tem_erro=false
+        while IFS= read -r file; do
+          if [[ -f "$file" || "$file" == *.* ]]; then
+            echo "ERRO: O arquivo $file não tem uma extensão. Todos os arquivos devem ter extensão."
+            tem_erro=true
+          fi
+        done < files.txt
+
+        if [ "$tem_erro" = true ]; then
+          echo "Enviando notificação para o Slack..."
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ser sem extensão."}' $SLACK_WEBHOOK_URL
+          exit 1
+        else
+          echo "Todos os arquivos estão sem extensão."
+        fi
