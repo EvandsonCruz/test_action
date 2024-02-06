@@ -26,7 +26,7 @@ jobs:
       run: |
         tem_erro=false
         while IFS= read -r file; do
-          if [[ -f "$file" || "$file" == *.* ]]; then
+          if [[ ! -f "$file" || "$file" == *.* ]]; then
             echo "ERRO: O arquivo $file não tem uma extensão. Todos os arquivos devem ter extensão."
             tem_erro=true
           fi
