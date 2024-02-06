@@ -47,7 +47,9 @@ jobs:
 
         if [ "$tem_erro" = true ]; then
           echo "Enviando notificação para o Slack..."
-          curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ter extensão.\n${saida}\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
+          #curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"ERRO: Um ou mais arquivos no pull request não tem extensão. Todos os arquivos devem ter extensão.\n${saida}\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_MESSAGE="ERRO: Um ou mais arquivos no pull request não tem extensão. Todos os arquivos devem ter extensão. PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           exit 1
         else
           echo "Todos os arquivos tem extensão."
