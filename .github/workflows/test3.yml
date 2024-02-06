@@ -5,9 +5,12 @@ on:
     types:
       - opened
       - synchronize
+      - reopened
+    paths-ignore:
+      - '.github/workflows/**'
 
 jobs:
-  validar_extensao:
+  validar-extensao:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +20,7 @@ jobs:
         fetch-depth: 0
 
     - name: Listar arquivos do pull request
-      id: listar_arquivos
+      id: listar-arquivos
       run: |
         git diff --name-only ${{ github.event.before }} ${{ github.sha }} > files.txt
         cat files.txt
@@ -25,17 +28,20 @@ jobs:
     - name: Verificar extensão de arquivos
       run: |
         tem_erro=false
-        while IFS= read -r file; do
-          if [[ ! -f "$file" || "$file" == *.* ]]; then
-            echo "ERRO: O arquivo $file não tem uma extensão. Todos os arquivos devem ter extensão."
+        saida=""
+
+        for arquivo in $(cat files.txt); do
+          if [[ -f "$arquivo" || "$arquivo" != *.* ]]; then
+            echo "ERRO: O arquivo $arquivo tem uma extensão. Todos os arquivos devem ser sem extensão."
             tem_erro=true
+            saida="$saida$arquivo\n"
           fi
-        done < files.txt
+        done
 
         if [ "$tem_erro" = true ]; then
           echo "Enviando notificação para o Slack..."
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request não tem extensão. Todos os arquivos devem ter extensão."}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ter extensão.\n$saida"}' $SLACK_WEBHOOK_URL
           exit 1
         else
-          echo "Todos os arquivos tem extensão."
+          echo "Todos os arquivos estão sem extensão."
         fi
