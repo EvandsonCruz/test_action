@@ -32,7 +32,7 @@ jobs:
 
         for arquivo in $(cat files.txt); do
           if [[ -f "$arquivo" || "$arquivo" != *.* ]]; then
-            echo "ERRO: O arquivo $arquivo tem uma extensão. Todos os arquivos devem ser sem extensão."
+            echo "ERRO: O arquivo $arquivo não tem uma extensão. Todos os arquivos devem ter extensão."
             tem_erro=true
             saida="$saida$arquivo\n"
           fi
@@ -40,8 +40,8 @@ jobs:
 
         if [ "$tem_erro" = true ]; then
           echo "Enviando notificação para o Slack..."
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ter extensão.\n$saida"}' $SLACK_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"ERRO: Um ou mais arquivos no pull request têm extensão. Todos os arquivos devem ter extensão.\n$saida"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           exit 1
         else
-          echo "Todos os arquivos estão sem extensão."
+          echo "Todos os arquivos tem extensão."
         fi
