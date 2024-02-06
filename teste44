@@ -1,4 +1,4 @@
-drop package ab.teste 
+drop package ab.teste  
 /
 create package ab.teste
 /
