@@ -24,7 +24,6 @@ jobs:
       id: obter-conteudo
       run: |
         if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened" ]]; then
-          echo "$(git diff --name-only HEAD^1)"
           
         else
           
