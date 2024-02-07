@@ -24,9 +24,9 @@ jobs:
       id: obter-conteudo
       run: |
         if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened" ]]; then
-          
+           echo "novo"
         else
-          
+           echo "sinc"
         fi
         
         tem_erro=false
