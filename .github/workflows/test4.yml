@@ -20,21 +20,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Obter conteúdo do pull request
-      id: obter-conteudo
-      run: |
-        if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened" ]]; then
-          echo "$(git diff --name-only HEAD^1)"
-          #echo "########################### $conteudo_pr"
-        else
-          #conteudo_pr=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          #echo "########################### $conteudo_pr"
-        fi
-        
-        tem_erro=false
-        saida=""
-
-        #echo "########################### ${{ conteudo_pr }}"
+    
 
         
 
