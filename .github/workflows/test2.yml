@@ -1,4 +1,4 @@
-name: Validar Presença da Palavra "alter" no Meio da Linha do Conteúdo do PR
+name: grant to public
 
 on:
   pull_request:
