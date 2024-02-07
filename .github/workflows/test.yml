@@ -50,7 +50,7 @@ jobs:
 
               # Restante do seu código para verificar palavras-chave
               for palavra_chave in "${palavras_chave[@]}"; do
-                if grep -q "$palavra_chave" "$arquivo"; then
+                if grep -q -i "$palavra_chave" "$arquivo"; then
                   echo "Encontrada a palavra '$palavra_chave' no novo arquivo: $arquivo"
                   encontrada=true
                   saida="$saida$palavra_chave no arquivo $arquivo\n"
@@ -60,7 +60,7 @@ jobs:
           else 
             for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
               for palavra_chave in "${palavras_chave[@]}"; do
-                if grep -q "$palavra_chave" "$arquivo"; then
+                if grep -q -i "$palavra_chave" "$arquivo"; then
                   echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
                   encontrada=true
                   saida="$saida$palavra_chave no arquivo $arquivo\n"
