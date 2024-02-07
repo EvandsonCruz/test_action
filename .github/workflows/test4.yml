@@ -34,6 +34,8 @@ jobs:
         tem_erro=false
         saida=""
 
+        echo "########################### $conteudo_pr"
+
         if echo "$conteudo_pr" | grep -q -i -E '\.\S{31}'; then
           echo "Encontrado um identificador com mais de 30 caracteres"
           SLACK_MESSAGE="Encontrado um identificador com mais de 30 caracteres no PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
