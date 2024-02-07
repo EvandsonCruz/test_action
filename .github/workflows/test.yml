@@ -30,9 +30,7 @@ jobs:
 
       - name: Verificar Conteúdo do PR
         run: |
-          palavras_chave=("alter table" "drop package" "grant")  # Substitua pela lista de palavras-chave desejada
-          outras_palavras=("ab.teste" "ab.dois" "to public")  # Substitua pela segunda lista de palavras 
-
+          palavras_chave=("drop package ab.teste")  # Substitua pela lista de palavras-chave desejada
           encontrada=false 
           saida=""
 
@@ -50,17 +48,12 @@ jobs:
             for arquivo in "${arquivos_adicionados[@]}"; do
               echo "Novo arquivo adicionado: $arquivo"
 
-              # Restante do seu código para verificar palavras-chave e outras_palavras
+              # Restante do seu código para verificar palavras-chave
               for palavra_chave in "${palavras_chave[@]}"; do
                 if grep -q "$palavra_chave" "$arquivo"; then
                   echo "Encontrada a palavra '$palavra_chave' no novo arquivo: $arquivo"
-                  for outra_palavra in "${outras_palavras[@]}"; do
-                    if grep -q "$outra_palavra" "$arquivo"; then
-                      echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                      encontrada=true
-                      saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                    fi
-                  done
+                  encontrada=true
+                  saida="$saida$palavra_chave no arquivo $arquivo\n"
                 fi
               done
             done
@@ -69,17 +62,14 @@ jobs:
               for palavra_chave in "${palavras_chave[@]}"; do
                 if grep -q "$palavra_chave" "$arquivo"; then
                   echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
-                  for outra_palavra in "${outras_palavras[@]}"; do
-                    if grep -q "$outra_palavra" "$arquivo"; then
-                      echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                      encontrada=true
-                      saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                    fi
-                  done
+                  encontrada=true
+                  saida="$saida$palavra_chave no arquivo $arquivo\n"
                 fi
               done
             done
           fi
+          
+          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
           
           echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
