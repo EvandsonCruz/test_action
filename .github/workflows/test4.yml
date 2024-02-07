@@ -23,12 +23,12 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-        if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
-          conteudo_pr=$(echo "($(git diff --name-only HEAD^1))")
-          echo "########################### ${{ conteudo_pr }}"
+        if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened" ]]; then
+          conteudo_pr=$(git diff --name-only HEAD^1)
+          echo "########################### $conteudo_pr"
         else
-          conteudo_pr=$(echo "(git diff --name-only ${{ github.event.before }} ${{ github.sha }})")
-          echo "########################### ${{ conteudo_pr }}"
+          conteudo_pr=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}")
+          echo "########################### $conteudo_pr"
         fi
 
     - name: Verificar identificador
