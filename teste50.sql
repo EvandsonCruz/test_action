@@ -1,1 +1,4 @@
-drop package ab.teste; 
+drop package ab.outro 
+/
+grant select on ab.teste to usuario
+/
