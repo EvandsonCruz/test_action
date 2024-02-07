@@ -24,10 +24,10 @@ jobs:
       id: obter-conteudo
       run: |
         if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
-          conteudo_pr=($(git diff --name-only HEAD^1)) >> $GITHUB_ENV
+          conteudo_pr=$(echo "($(git diff --name-only HEAD^1))")
           echo "########################### ${{ conteudo_pr }}"
         else
-          conteudo_pr=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }}) >> $GITHUB_ENV
+          conteudo_pr=$(echo "(git diff --name-only ${{ github.event.before }} ${{ github.sha }})")
           echo "########################### ${{ conteudo_pr }}"
         fi
 
