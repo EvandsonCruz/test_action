@@ -98,6 +98,6 @@ jobs:
             REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
             REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
             AUTHOR_NAME=$(gh pr view $PR_NUMBER --json author --template '{{.author}}')
-            gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@AUTHOR_NAME por favor revisar"
+            gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@${{ AUTHOR_NAME }} por favor revisar"
             exit 0
           fi
