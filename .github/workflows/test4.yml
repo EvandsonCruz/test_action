@@ -24,9 +24,9 @@ jobs:
       id: obter-conteudo
       run: |
         if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
-          conteudo_pr=($(git diff --name-only HEAD^1))
+          conteudo_pr=($(git diff --name-only HEAD^1)) >> $GITHUB_ENV
         else
-          conteudo_pr=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          conteudo_pr=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }}) >> $GITHUB_ENV
         fi
 
     - name: Verificar identificador
