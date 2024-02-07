@@ -37,7 +37,7 @@ jobs:
         saida=""
 
         for arquivo in $(cat files.txt); do
-          if [[ -f "$arquivo" || "$arquivo" != *.* ]]; then
+          if [[ "$arquivo" != *.* ]]; then
             echo "############arquivo###########  $arquivo"
             echo "ERRO: O arquivo $arquivo não tem uma extensão. Todos os arquivos devem ter extensão."
             tem_erro=true
