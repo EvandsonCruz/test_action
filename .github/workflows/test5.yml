@@ -36,7 +36,7 @@ jobs:
           echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
           # Obtém a lista de arquivos adicionados no pull request
-          arquivos_adicionados=git diff --name-only HEAD^1 | while IFS= read -r arquivo; do
+          arquivos_adicionados=($(git diff --name-only HEAD^1 | while IFS= read -r arquivo)); do
           echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
 
           for arquivo in "${arquivos_adicionados[@]}"; do
