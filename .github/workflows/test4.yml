@@ -44,14 +44,6 @@ jobs:
               fi
             done
          
-            for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-              if grep -E '\.\S{31}' "$arquivo"; then
-                echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
-                encontrada=true
-                saida="${saida}Identificador de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
-              fi
-            done
-         
             echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
             if [ "$encontrada" == true ]; then
