@@ -41,7 +41,7 @@ jobs:
               if grep -E '\.\S{31}' "$arquivo"; then
                 echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
-                saida="$saidaIdentificador de objeto com mais de 30 caracteres no arquivo $arquivo\n"
+                saida="$saida Identificador de objeto com mais de 30 caracteres no arquivo $arquivo\n"
               fi
             done
           else 
@@ -49,7 +49,7 @@ jobs:
               if grep -E '\.\S{31}' "$arquivo"; then
                 echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
-                saida="$saidaIdentificador de objeto com mais de 30 caracteres no arquivo $arquivo\n"
+                saida="$saida Identificador de objeto com mais de 30 caracteres no arquivo $arquivo\n"
               fi
             done
           fi
