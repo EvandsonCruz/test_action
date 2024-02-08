@@ -40,7 +40,7 @@ jobs:
             echo "############arquivo###########  $arquivo"
             echo "ERRO: O arquivo $arquivo não tem uma extensão. Todos os arquivos devem ter extensão."
             tem_erro=true
-            saida="$saida$arquivo\n"
+            saida="$saida$arquivo"$'\n'
             echo "##########saida########### $saida"
           fi
         done
