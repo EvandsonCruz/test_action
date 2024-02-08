@@ -26,6 +26,7 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
+         saida=""
          if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
