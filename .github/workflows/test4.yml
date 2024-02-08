@@ -37,7 +37,7 @@ jobs:
               echo "Novo arquivo adicionado: $arquivo"
 
               # Restante do código para verificar a sequência de 31 caracteres após um ponto
-              if grep -E '.' "$arquivo" | cut -d '.' -f 2 | grep -E '^.[^ ]* '; then
+              if grep -E '^.[^ ]* ' "$arquivo"; then
                 echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
                 saida="${saida}Identificador de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
