@@ -1,1 +1,1 @@
-create table ab.testetestetestetestetestetestet (col1 number);       
+create table ab.TESTETESTETESTETESTETESTETESTEt (col1 number);       
