@@ -26,7 +26,7 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-         if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
+         
             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
             # Obtém a lista de arquivos adicionados no pull request
@@ -43,7 +43,7 @@ jobs:
                 saida="${saida}Identificador de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
               fi
             done
-          else 
+         
             for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
               if grep -E '\.\S{31}' "$arquivo"; then
                 echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
@@ -51,18 +51,17 @@ jobs:
                 saida="${saida}Identificador de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
               fi
             done
-          fi
-          
-          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
+         
+            echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
-          if [ "$encontrada" == true ]; then
+            if [ "$encontrada" == true ]; then
             echo "::warning::Encontrada uma sequência de 31 caracteres após um ponto."
             #gh pr edit ${{ github.event.number }} --add-label bug
-          fi
+            fi
 
-          echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
+            echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
 
-          if [ "$encontrada" == true ]; then
+            if [ "$encontrada" == true ]; then
             SLACK_MESSAGE="Identifier too long: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
             PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
@@ -72,7 +71,7 @@ jobs:
             gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
             ${saida}Por favor revisar."
             exit 1
-          fi
+            fi
 
        
         
