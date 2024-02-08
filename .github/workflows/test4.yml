@@ -37,7 +37,7 @@ jobs:
               if grep -E '\.\S{31}' "$arquivo"; then
                 echo "Encontrada uma sequência de 31 caracteres após um ponto no arquivo: $arquivo"
                 encontrada=true
-                saida="$saida Sequência de 31 caracteres após um ponto no arquivo $arquivo\n"
+                saida="$saidaSequência de 31 caracteres após um ponto no arquivo $arquivo\n"
               fi
             done
           else 
@@ -46,7 +46,7 @@ jobs:
               if grep -E '\.\S{31}' "$arquivo"; then
                 echo "Encontrada uma sequência de 31 caracteres após um ponto no arquivo: $arquivo"
                 encontrada=true
-                saida="$saida Sequência de 31 caracteres após um ponto no arquivo $arquivo\n"
+                saida="$saidaSequência de 31 caracteres após um ponto no arquivo $arquivo\n"
               fi
             done
           fi
