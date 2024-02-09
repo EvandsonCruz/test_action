@@ -40,7 +40,7 @@ jobs:
               # Restante do código para verificar a sequência de 31 caracteres após um ponto
 
               contagem=$(grep -Eo '\.[^ ]+' "$arquivo" | cut -c 2- | awk '{print length}')
-              contagem_int=$(echo "$contagem" | bc)
+              contagem_int=$(echo "$contagem" | tr -d '[:space:]')
 
 
               echo "##########################contagem###################################  $contagem"
