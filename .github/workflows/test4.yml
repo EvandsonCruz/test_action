@@ -47,9 +47,13 @@ jobs:
                 echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
                 saida="${saida}Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo $arquivo"$'\n'
+                echo "saida >>>>>>>>>>>>>>>>>>>>>> $saida"
+                echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
               fi
 
               contagem=0
+
+              echo "##########################contagem depois do if###################################  $contagem"
               
             done
          
