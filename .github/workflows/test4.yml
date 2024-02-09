@@ -42,7 +42,7 @@ jobs:
 
               echo "##########################contagem###################################  $contagem"
               
-              if [ "$(echo "$contagem > 30" | bc)" -eq 1 ]; then
+              if [ "$contagem" -gt "30" ]; then
                 identificador=$(grep -Eo '\.[^ ]+' $arquivo | cut -c 2-)
                 echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
