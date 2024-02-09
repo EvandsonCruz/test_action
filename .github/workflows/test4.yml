@@ -43,7 +43,7 @@ jobs:
               contagem_int=$(echo "$contagem")
 
 
-              echo "##########################contagem###################################  $contagem"
+              echo "##########################contagem###################################  $contagem_int"
               
               if [ $contagem_int -gt 30 ]; then
                 identificador=$(grep -Eo '\.[^ ]+' $arquivo | cut -c 2-)
