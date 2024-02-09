@@ -39,6 +39,8 @@ jobs:
               # Restante do código para verificar a sequência de 31 caracteres após um ponto
 
               contagem=$(grep -Eo '\.[^ ]+' $arquivo | cut -c 2- | awk '{print length}')
+
+              echo "##########################contagem###################################  $contagem"
               
               if [ "$contagem" -gt 30 ]; then
                 identificador=$(grep -Eo '\.[^ ]+' $arquivo | cut -c 2-)
