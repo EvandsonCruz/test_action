@@ -55,7 +55,7 @@ jobs:
                 echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
               fi
 
-              echo "##########################contagem depois do if###################################  $contagem"
+              echo "##########################contagem depois do if###################################  $contagem_int"
               
             done
          
