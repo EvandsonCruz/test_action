@@ -40,13 +40,13 @@ jobs:
               contagem_int=0
               # Restante do código para verificar a sequência de 31 caracteres após um ponto
 
-              contagem=$(grep -Eo '[[:alpha:]]{30,}' $arquivo | wc -l)
-              contagem_int=$(echo "$contagem")
+              contagem=$(grep -Eo '[[:alpha:]_]{30,}' teste.txt | wc -l)
+              #contagem_int=$(echo "$contagem")
 
 
-              echo "##########################contagem###################################  $contagem_int"
+              echo "##########################contagem###################################  $contagem"
               
-              if [ $contagem_int -gt 0 ]; then
+              if [ $contagem -gt 0 ]; then
                 identificador=$(grep -Eo '\.[^ ]+' $arquivo | cut -c 2-)
                 echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
