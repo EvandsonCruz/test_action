@@ -50,7 +50,7 @@ jobs:
                 identificador=$(grep -Eo '[[:alpha:]_]{31,}' $arquivo)
                 echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
-                saida="Identificador${identificador} de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
+                saida="Identificador ${identificador} de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
                 echo "saida >>>>>>>>>>>>>>>>>>>>>> $saida"
                 echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
               fi
