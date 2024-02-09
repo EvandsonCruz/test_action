@@ -43,7 +43,7 @@ jobs:
 
               echo "##########################contagem###################################  $contagem"
               
-              if [ grep -Eo '\.[^ ]+' $arquivo | cut -c 2- | awk '{print length}' -gt 30 ]; then
+              if [ $(grep -Eo '\.[^ ]+' $arquivo | cut -c 2- | awk '{print length}') -gt 30 ]; then
                 identificador=$(grep -Eo '\.[^ ]+' $arquivo | cut -c 2-)
                 echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
