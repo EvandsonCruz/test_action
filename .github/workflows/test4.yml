@@ -35,14 +35,15 @@ jobs:
 
             for arquivo in "${arquivos_adicionados[@]}"; do
               echo "Novo arquivo adicionado: $arquivo"
-
+              encontrada=false
+              contagem=0
               # Restante do código para verificar a sequência de 31 caracteres após um ponto
 
               contagem=$(grep -Eo '\.[^ ]+' $arquivo | cut -c 2- | awk '{print length}')
 
               echo "##########################contagem###################################  $contagem"
               
-              if [ "$(contagem) > 50" ]; then
+              if ((grep -Eo '\.[^ ]+' $arquivo | cut -c 2- | awk '{print length}') > 50); then
                 identificador=$(grep -Eo '\.[^ ]+' $arquivo | cut -c 2-)
                 echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
                 encontrada=true
@@ -50,8 +51,6 @@ jobs:
                 echo "saida >>>>>>>>>>>>>>>>>>>>>> $saida"
                 echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
               fi
-
-              contagem=0
 
               echo "##########################contagem depois do if###################################  $contagem"
               
