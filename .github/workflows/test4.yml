@@ -49,6 +49,8 @@ jobs:
                 saida="${saida}Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo $arquivo"$'\n'
               fi
             done
+
+            contagem=0
          
             echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
