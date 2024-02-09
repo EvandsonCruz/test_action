@@ -40,7 +40,7 @@ jobs:
               contagem_int=0
               # Restante do código para verificar a sequência de 31 caracteres após um ponto
 
-              contagem=$(grep -Eo '[[:alpha:]_]{30,}' teste.txt | wc -l)
+              contagem=$(grep -Eo '[[:alpha:]_]{30,}' $arquivo | wc -l)
               #contagem_int=$(echo "$contagem")
 
 
