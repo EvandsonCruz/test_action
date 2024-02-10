@@ -62,4 +62,6 @@ jobs:
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
           ${saida}Por favor revisar."
           exit 1
+        else
+          echo "::white_check_mark::Não encontrado identificador de objeto com mais de 30 caracteres"
         fi
