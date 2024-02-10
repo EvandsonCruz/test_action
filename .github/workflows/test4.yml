@@ -26,62 +26,54 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-         
-            echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
-            # Obtém a lista de arquivos adicionados no pull request
-            arquivos_adicionados=($(git diff --name-only HEAD^1))
-            echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
+        # Obtém a lista de arquivos adicionados no pull request
+        arquivos_adicionados=($(git diff --name-only HEAD^1))
+        echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
 
-            for arquivo in "${arquivos_adicionados[@]}"; do
-              echo "Novo arquivo adicionado: $arquivo"
-              encontrada=false
-              contagem=0
-              contagem_int=0
-              # Restante do código para verificar a sequência de 31 caracteres após um ponto
+        encontrada=false  # Inicializa encontrada como falso fora do loop
 
-              contagem=$(grep -Eo '[[:alpha:]_]{31,}' $arquivo | wc -l)
-              #contagem_int=$(echo "$contagem")
+        for arquivo in "${arquivos_adicionados[@]}"; do
+          echo "Novo arquivo adicionado: $arquivo"
+          contagem=$(grep -Eo '[[:alpha:]_]{31,}' "$arquivo" | wc -l)
 
+          echo "##########################contagem###################################  $contagem"
+          
+          if [ $contagem -gt 0 ]; then
+            identificador=$(grep -Eo '[[:alpha:]_]{31,}' "$arquivo" | head -n 1)  # Pega apenas a primeira ocorrência
+            echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
+            encontrada=true
+            saida="Identificador ${identificador} de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
+            echo "saida >>>>>>>>>>>>>>>>>>>>>> $saida"
+            echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
+            break  # Se encontrou uma vez, sai do loop
+          fi
 
-              echo "##########################contagem###################################  $contagem"
-              
-              if [ $contagem -gt 0 ]; then
-                identificador=$(grep -Eo '[[:alpha:]_]{31,}' $arquivo)
-                echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
-                encontrada=true
-                saida="Identificador ${identificador} de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
-                echo "saida >>>>>>>>>>>>>>>>>>>>>> $saida"
-                echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
-                break
-              fi
-
-              echo "##########################contagem depois do if###################################  $contagem_int"
-              
-            done
-         
-            echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
-
-            if [ "$encontrada" == true ]; then
-            echo "::warning::Encontrado identificador de objeto com mais de 30 caracteres"
-            #gh pr edit ${{ github.event.number }} --add-label bug
-            fi
-
-            echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
-
-            if [ "$encontrada" == true ]; then
-            SLACK_MESSAGE="Identifier too long: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-            PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
-            REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
-            REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
-            AUTHOR_NAME=${{ github.event.pull_request.user.login }}
-            gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-            ${saida}Por favor revisar."
-            exit 1
-            fi
-
+          echo "##########################contagem depois do if###################################  $contagem"
+          
+        done
        
-        
+        echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
-        
+        if [ "$encontrada" == true ]; then
+          echo "::warning::Encontrado identificador de objeto com mais de 30 caracteres"
+          #gh pr edit ${{ github.event.number }} --add-label bug
+        fi
+
+        echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
+
+        if [ "$encontrada" == true ]; then
+          SLACK_MESSAGE="Identifier too long: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+          ${saida}Por favor revisar."
+          exit 1
+        fi
+        fi
+        fi
+        fi
