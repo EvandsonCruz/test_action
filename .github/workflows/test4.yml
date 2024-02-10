@@ -63,5 +63,5 @@ jobs:
           ${saida}Por favor revisar."
           exit 1
         else
-          echo ":white_check_mark: Não encontrado identificador de objeto com mais de 30 caracteres"
+          echo "Não encontrado identificador de objeto com mais de 30 caracteres"
         fi
