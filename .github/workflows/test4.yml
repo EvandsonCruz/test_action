@@ -11,7 +11,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  validar-trecho:
+  validar-identificador:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,40 +26,33 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
         # Obtém a lista de arquivos adicionados no pull request
         arquivos_adicionados=($(git diff --name-only HEAD^1))
-        echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
+        #echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
 
         encontrada=false  # Inicializa encontrada como falso fora do loop
         saida=""  # Inicializa a variável de saída
 
         for arquivo in "${arquivos_adicionados[@]}"; do
-          echo "Novo arquivo adicionado: $arquivo"
+          echo "Validando arquivo adicionado: $arquivo"
           identificador=$(grep -Eo '[[:alpha:]_]{31,}' "$arquivo" | head -n 1)  # Pega apenas a primeira ocorrência
 
           if [ -n "$identificador" ]; then
-            echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
+            echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
             encontrada=true
-            saida+="Identificador ${identificador} de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
-            echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
+            saida+="Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo $arquivo"$'\n'
+            #echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
           fi
 
-          echo "##########################contagem depois do if###################################  $contagem"
+          #echo "##########################contagem depois do if###################################  $contagem"
           
         done
        
-        echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
+        #echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
         if [ "$encontrada" == true ]; then
-          echo "::warning::Encontrado identificador de objeto com mais de 30 caracteres"
-          #gh pr edit ${{ github.event.number }} --add-label bug
-        fi
-
-        echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
-
-        if [ "$encontrada" == true ]; then
+          echo "::error::Encontrado identificador de objeto com mais de 30 caracteres"
           SLACK_MESSAGE="Identifier too long: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
