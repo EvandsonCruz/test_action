@@ -33,21 +33,17 @@ jobs:
         echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
 
         encontrada=false  # Inicializa encontrada como falso fora do loop
+        saida=""  # Inicializa a variável de saída
 
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Novo arquivo adicionado: $arquivo"
-          contagem=$(grep -Eo '[[:alpha:]_]{31,}' "$arquivo" | wc -l)
+          identificador=$(grep -Eo '[[:alpha:]_]{31,}' "$arquivo" | head -n 1)  # Pega apenas a primeira ocorrência
 
-          echo "##########################contagem###################################  $contagem"
-          
-          if [ $contagem -gt 0 ]; then
-            identificador=$(grep -Eo '[[:alpha:]_]{31,}' "$arquivo" | head -n 1)  # Pega apenas a primeira ocorrência
+          if [ -n "$identificador" ]; then
             echo "Identificador de objeto com mais de 30 caracteres no arquivo: $arquivo"
             encontrada=true
-            saida="Identificador ${identificador} de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
-            echo "saida >>>>>>>>>>>>>>>>>>>>>> $saida"
+            saida+="Identificador ${identificador} de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
             echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
-            break  # Se encontrou uma vez, sai do loop
           fi
 
           echo "##########################contagem depois do if###################################  $contagem"
