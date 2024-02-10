@@ -53,6 +53,7 @@ jobs:
                 saida="Identificador ${identificador} de objeto com mais de 30 caracteres no arquivo $arquivo"$'\n'
                 echo "saida >>>>>>>>>>>>>>>>>>>>>> $saida"
                 echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
+                break
               fi
 
               echo "##########################contagem depois do if###################################  $contagem_int"
