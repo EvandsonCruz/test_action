@@ -25,7 +25,6 @@ jobs:
     - name: Verificar Conteúdo do PR
       run: |
 
-            set -x
             IFS=$'\n'
             arquivos_adicionados=($(git diff --name-only HEAD^1 | grep " "))
             echo "##########################arquivos_adicionados################################### ${arquivos_adicionados[@]}"
@@ -37,14 +36,14 @@ jobs:
               echo "Validando arquivo adicionado: $arquivo"
             
               if [[ "$arquivo" == *" "* ]]; then
-                echo "Erro: O arquivo '$arquivo' tem espaços em seu nome."
+                echo "Erro: O nome de arquivo '$arquivo' tem espaços."
                 saida="$saida$arquivo"$'\n'
                 encontrada=true
               fi
             done
             
             if [ "$encontrada" == true ]; then
-              echo "::warning::Um ou mais nome de arquivos no pull request contém espaço"
+              echo "::error::Um ou mais nome de arquivos no pull request contém espaço"
               SLACK_MESSAGE="Espaço em nome de arquivo do PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
               curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
               PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
