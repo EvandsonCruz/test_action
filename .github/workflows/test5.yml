@@ -25,20 +25,25 @@ jobs:
     - name: Verificar Conteúdo do PR
       run: |
 
-        encontrada=false
-        saida=""
-        files_with_spaces=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep " ")
+        arquivos_adicionados=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep " "))
+        #echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
 
-        if [ -n "$files_with_spaces" ]; then
-          echo "Erro: Os seguintes arquivos têm espaços em seus nomes:"
-          echo "$files_with_spaces"
-          saida="$saida$files_with_spaces"'\n'
-          encontrada=true
-            else
-              echo "O nome do arquivo '$files_with_spaces' não contém espaços."
-            fi
-                
-        echo ">>>>>>>depois if>>>>>>>>>>>>> $encontrada"
+        encontrada=false  # Inicializa encontrada como falso fora do loop
+        saida=""  # Inicializa a variável de saída
+
+        for arquivo in "${arquivos_adicionados[@]}"; do
+          echo "Validando arquivo adicionado: $arquivo"
+
+          if [ -n "$files_with_spaces" ]; then
+            echo "Erro: Os seguintes arquivos têm espaços em seus nomes:"
+            echo "$files_with_spaces"
+            saida="$saida$files_with_spaces"'\n'
+            encontrada=true
+          fi
+
+          #echo "##########################contagem depois do if###################################  $contagem"
+          
+        done
         
         if [ "$encontrada" == true ]; then
           echo "::warning::Um ou mais nome de arquivos no pull request contém espaço"
