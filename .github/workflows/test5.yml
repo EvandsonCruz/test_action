@@ -26,22 +26,21 @@ jobs:
       run: |
 
         arquivos_adicionados=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep " "))
-        echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
+        echo "##########################arquivos_adicionados###################################"
+        echo "${arquivos_adicionados[@]}"
 
         encontrada=false  # Inicializa encontrada como falso fora do loop
         saida=""  # Inicializa a variável de saída
 
-        
-          echo "Validando arquivo adicionado: $arquivos_adicionados"
+        for arquivo in "${arquivos_adicionados[@]}"; do
+          echo "Validando arquivo adicionado: $arquivo"
 
-          if [ -n "$arquivos_adicionados" ]; then
-            echo "Erro: Os seguintes arquivos têm espaços em seus nomes:"
-            echo "$arquivos_adicionados"
-            saida="$saida$arquivos_adicionados"'\n'
+          if [[ "$arquivo" == *" "* ]]; then
+            echo "Erro: O arquivo '$arquivo' tem espaços em seu nome."
+            saida="$saida$arquivo"'\n'
             encontrada=true
           fi
-
-          #echo "##########################contagem depois do if###################################  $contagem"
+        done
                  
         if [ "$encontrada" == true ]; then
           echo "::warning::Um ou mais nome de arquivos no pull request contém espaço"
