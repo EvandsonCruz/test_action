@@ -27,7 +27,7 @@ jobs:
 
         set -x
         IFS=$'\n'
-        arquivos_adicionados=($(git diff --name-only HEAD^1) | grep " "))
+        arquivos_adicionados=($(git diff --name-only HEAD^1 | grep " "))
         echo "##########################arquivos_adicionados################################### $arquivos_adicionados"
         echo "${arquivos_adicionados[@]}"
 
