@@ -33,7 +33,7 @@ jobs:
           echo "$files_with_spaces"
           encontrada=true
             else
-              echo "O nome do arquivo '$arquivo' não contém espaços."
+              echo "O nome do arquivo '$files_with_spaces' não contém espaços."
             fi
                 
         echo ">>>>>>>depois if>>>>>>>>>>>>> $encontrada"
