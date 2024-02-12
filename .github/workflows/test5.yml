@@ -51,6 +51,8 @@ jobs:
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
-          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME Espaço no nome do arquivo $saida\nPor favor revisar"
-          exit 0
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME 
+          Espaço no nome do arquivo 
+          ${saida}Por favor revisar."
+          exit 1
         fi
