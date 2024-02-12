@@ -34,10 +34,10 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Validando arquivo adicionado: $arquivo"
 
-          if [ -n "$files_with_spaces" ]; then
+          if [ -n "$arquivos_adicionados" ]; then
             echo "Erro: Os seguintes arquivos têm espaços em seus nomes:"
-            echo "$files_with_spaces"
-            saida="$saida$files_with_spaces"'\n'
+            echo "$arquivos_adicionados"
+            saida="$saida$arquivos_adicionados"'\n'
             encontrada=true
           fi
 
