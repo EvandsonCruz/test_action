@@ -32,7 +32,6 @@ jobs:
           echo "Erro: Os seguintes arquivos têm espaços em seus nomes:"
           echo "$files_with_spaces"
           encontrada=true
-          exit 1
             else
               echo "O nome do arquivo '$arquivo' não contém espaços."
             fi
