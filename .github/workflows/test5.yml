@@ -25,34 +25,35 @@ jobs:
     - name: Verificar Conteúdo do PR
       run: |
 
-        set -x
-        IFS=$'\n'
-        arquivos_adicionados=($(git diff --name-only HEAD^1 | grep " "))
-        echo "##########################arquivos_adicionados################################### $arquivos_adicionados"
-        echo "${arquivos_adicionados[@]}"
+            set -x
+            IFS=$'\n'
+            arquivos_adicionados=($(git diff --name-only HEAD^1 | grep " "))
+            echo "##########################arquivos_adicionados################################### ${arquivos_adicionados[@]}"
+            
+            encontrada=false  # Inicializa encontrada como falso fora do loop
+            saida=""  # Inicializa a variável de saída
+            
+            for arquivo in "${arquivos_adicionados[@]}"; do
+              echo "Validando arquivo adicionado: $arquivo"
+            
+              if [[ "$arquivo" == *" "* ]]; then
+                echo "Erro: O arquivo '$arquivo' tem espaços em seu nome."
+                saida="$saida$arquivo"$'\n'
+                encontrada=true
+              fi
+            done
+            
+            if [ "$encontrada" == true ]; then
+              echo "::warning::Um ou mais nome de arquivos no pull request contém espaço"
+              SLACK_MESSAGE="Espaço no nome do arquivo do PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+              curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+              PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+              REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+              REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+              AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+              gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME 
+              Espaço no nome do arquivo 
+              ${saida}Por favor revisar."
+              exit 1
+            fi
 
-        encontrada=false  # Inicializa encontrada como falso fora do loop
-        saida=""  # Inicializa a variável de saída
-
-        
-          echo "Validando arquivo adicionado: $arquivos_adicionados"
-
-          if [[ "$arquivos_adicionados" == *" "* ]]; then
-            echo "Erro: O arquivo '$arquivos_adicionados' tem espaços em seu nome."
-            saida="$saida$arquivos_adicionados"$'\n'
-            encontrada=true
-          fi
-                 
-        if [ "$encontrada" == true ]; then
-          echo "::warning::Um ou mais nome de arquivos no pull request contém espaço"
-          SLACK_MESSAGE="Espaço no nome do arquivo do PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
-          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
-          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
-          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
-          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME 
-          Espaço no nome do arquivo 
-          ${saida}Por favor revisar."
-          exit 1
-        fi
