@@ -10,7 +10,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  validar-trecho:
+  validar-espacos:
     runs-on: ubuntu-latest
 
     steps:
