@@ -27,7 +27,7 @@ jobs:
 
         set -x
         arquivos_adicionados=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep " "))
-        echo "##########################arquivos_adicionados###################################"
+        echo "##########################arquivos_adicionados################################### $arquivos_adicionados"
         echo "${arquivos_adicionados[@]}"
 
         encontrada=false  # Inicializa encontrada como falso fora do loop
