@@ -26,11 +26,13 @@ jobs:
       run: |
 
         encontrada=false
+        saida=""
         files_with_spaces=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep " ")
 
         if [ -n "$files_with_spaces" ]; then
           echo "Erro: Os seguintes arquivos têm espaços em seus nomes:"
           echo "$files_with_spaces"
+          saida="$saida$files_with_spaces"'\n'
           encontrada=true
             else
               echo "O nome do arquivo '$files_with_spaces' não contém espaços."
