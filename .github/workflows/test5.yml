@@ -39,7 +39,7 @@ jobs:
 
           if [[ "$arquivos_adicionados" == *" "* ]]; then
             echo "Erro: O arquivo '$arquivos_adicionados' tem espaços em seu nome."
-            saida="$saida$arquivos_adicionados"'\n'
+            saida="$saida$arquivos_adicionados"$'\n'
             encontrada=true
           fi
                  
