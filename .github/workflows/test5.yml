@@ -33,15 +33,14 @@ jobs:
         encontrada=false  # Inicializa encontrada como falso fora do loop
         saida=""  # Inicializa a variável de saída
 
-        for arquivo in "${arquivos_adicionados[@]}"; do
-          echo "Validando arquivo adicionado: $arquivo"
+        
+          echo "Validando arquivo adicionado: $arquivos_adicionados"
 
-          if [[ "$arquivo" == *" "* ]]; then
-            echo "Erro: O arquivo '$arquivo' tem espaços em seu nome."
-            saida="$saida$arquivo"'\n'
+          if [[ "$arquivos_adicionados" == *" "* ]]; then
+            echo "Erro: O arquivo '$arquivos_adicionados' tem espaços em seu nome."
+            saida="$saida$arquivos_adicionados"'\n'
             encontrada=true
           fi
-        done
                  
         if [ "$encontrada" == true ]; then
           echo "::warning::Um ou mais nome de arquivos no pull request contém espaço"
