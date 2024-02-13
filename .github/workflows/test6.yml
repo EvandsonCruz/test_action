@@ -24,8 +24,7 @@ jobs:
         arquivos_alterados=($(git diff --name-only HEAD^1))
 
         # Contar o número de arquivos no pull request
-        contagem_arquivos=${#arquivos_alterados[@]}
-  
+        contagem_arquivos=${#arquivos_alterados[@]}  
         # Verificar se há mais de um arquivo no pull request
         if [ "$contagem_arquivos" -gt 1 ]; then
           # Obter a lista de arquivos SQL no pull request
@@ -34,13 +33,17 @@ jobs:
           # Inicializar uma variável para rastrear se há mais de um commit
           mais_de_um_commit=false
 
+          contagem_commits=$(git rev-list --count HEAD)
+
+          echo "################################## $contagem_commits"
+
           for arquivo in "${arquivos[@]}"; do
             # Verificar se o arquivo contém uma declaração CREATE TABLE
             if grep -qE 'CREATE TABLE' "$arquivo"; then
               # Obter a contagem de commits para o arquivo específico
-              contagem_commits=$(git rev-list --count HEAD)
+             
 
-              echo "################################## $contagem_commits"
+             
 
               # Se o arquivo tiver mais de um commit, configurar a variável
               if [ "$contagem_commits" -gt 1 ]; then
