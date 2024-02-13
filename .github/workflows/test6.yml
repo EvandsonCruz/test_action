@@ -23,13 +23,11 @@ jobs:
         arquivos_alterados=($(git diff --name-only HEAD^1))
 
         # Contar o número de arquivos no pull request
-        contagem_arquivos=${#arquivos_alterados[@]}
-
-        echo "::set-output name=contagem_arquivos::$contagem_arquivos"
+        contagem_arquivos=${#arquivos_alterados[@]} >> $GITHUB_ENV
 
     - name: Validar Commits nos Arquivos SQL
       run: |
-        contagem_arquivos=${{ needs.obter-arquivos.outputs.contagem_arquivos }}
+        contagem_arquivos=${{ needs.obter-arquivos.contagem_arquivos }}
 
         # Verificar se há mais de um arquivo no pull request
         if [ "$contagem_arquivos" -gt 1 ]; then
