@@ -27,7 +27,7 @@ jobs:
         contagem_arquivos=${#arquivos_alterados[@]}
   
         # Verificar se há mais de um arquivo no pull request
-        if [ "##################################################### $contagem_arquivos" -gt 1 ]; then
+        if [ "$contagem_arquivos" -gt 1 ]; then
           # Obter a lista de arquivos SQL no pull request
           arquivos=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }}))
 
@@ -40,7 +40,7 @@ jobs:
               # Obter a contagem de commits para o arquivo específico
               contagem_commits=$(git rev-list --count HEAD)
 
-              echo "$contagem_commits"
+              echo "################################## $contagem_commits"
 
               # Se o arquivo tiver mais de um commit, configurar a variável
               if [ "$contagem_commits" -gt 1 ]; then
