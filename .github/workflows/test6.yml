@@ -29,7 +29,7 @@ jobs:
         # Verificar se há mais de um arquivo no pull request
         if [ "$contagem_arquivos" -gt 1 ]; then
           # Obter a lista de arquivos SQL no pull request
-          arquivos=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }}))
+          arquivos=($(git diff --name-only HEAD^1))
 
           # Inicializar uma variável para rastrear se há mais de um commit
           mais_de_um_commit=false
