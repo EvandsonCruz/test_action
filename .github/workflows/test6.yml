@@ -33,7 +33,7 @@ jobs:
           # Inicializar uma variável para rastrear se há mais de um commit
           mais_de_um_commit=false
 
-          contagem_commits=$(git rev-list --count HEAD)
+          contagem_commits=$(git rev-list --count HEAD^1)
 
           echo "################################## $contagem_commits"
 
