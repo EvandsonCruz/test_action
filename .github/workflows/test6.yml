@@ -61,7 +61,7 @@ jobs:
 
         if [ "$mais_de_um_commit" == false ]; then
           echo "::error::O pull request tem create table e mais de um arquivo, porém não tem mais de um commit. Crie um novo PR fazendo commits separados para garantir a ordem de execução e suas dependências"
-          SLACK_MESSAGE="O pull request tem create table e mais de um arquivo, porém não tem mais de um commit. Crie um novo PR fazendo commits separados para garantir a ordem de execução e suas dependências. PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n"
+          SLACK_MESSAGE="O pull request tem create table e mais de um arquivo, porém não tem mais de um commit.\nCrie um novo PR fazendo commits separados para garantir a ordem de execução e suas dependências.\nPR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
