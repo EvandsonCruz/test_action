@@ -40,6 +40,8 @@ jobs:
               # Obter a contagem de commits para o arquivo específico
               contagem_commits=$(git rev-list --count HEAD)
 
+              echo "$contagem_commits"
+
               # Se o arquivo tiver mais de um commit, configurar a variável
               if [ "$contagem_commits" -gt 1 ]; then
                 mais_de_um_commit=true
