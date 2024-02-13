@@ -17,6 +17,9 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Configurar variável de ambiente GH_TOKEN
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
+
     - name: Obter lista de arquivos alterados
       run: |
         set -x
@@ -33,7 +36,7 @@ jobs:
           # Inicializar uma variável para rastrear se há mais de um commit
           mais_de_um_commit=false
 
-          contagem_commits=$(git rev-list --count HEAD^1)
+          contagem_commits=$(gh pr view ${{ github.event.number }} --json commits -q '.commits | length')
 
           echo "################################## $contagem_commits"
 
