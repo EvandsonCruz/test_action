@@ -34,7 +34,7 @@ jobs:
           arquivos=($(git diff --name-only HEAD^1))
 
           # Inicializar uma variável para rastrear se há mais de um commit
-          mais_de_um_commit=false
+          mais_de_um_commit=true
 
           contagem_commits=$(gh pr view ${{ github.event.number }} --json commits -q '.commits | length')
 
@@ -46,17 +46,30 @@ jobs:
               # Se o arquivo tiver mais de um commit, configurar a variável
               if [ "$contagem_commits" -lt 2 ]; then
                 #echo "######################### entrou no laço"
-                #mais_de_um_commit=true
+                mais_de_um_commit=false
                 # Validar se há mais de um commit em pelo menos um arquivo
                 if [ "$mais_de_um_commit" == false ]; then
-                echo "Erro: O pull request não tem mais de um commit. Crie um novo PR para garantir a ordem de execução"
-                #exit 1
+                echo "Erro: O pull request tem create table, mais de um arquivo, porém não tem mais de um commit. Crie um novo PR para garantir a ordem de execução"
+                break
                 else
                 echo "O pull request tem mais de um commit."
                 fi
               fi
             fi
           done
+        fi
 
-          
+        if [ "$mais_de_um_commit" == false ]; then
+          echo "::error::O pull request tem create table, mais de um arquivo, porém não tem mais de um commit. Crie um novo PR para garantir a ordem de execução"
+          SLACK_MESSAGE="O pull request tem create table, mais de um arquivo, porém não tem mais de um commit. Crie um novo PR para garantir a ordem de execução. PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+          O pull request tem create table, mais de um arquivo, porém não tem mais de um commit. Crie um novo PR para garantir a ordem de execução.
+          Por favor revisar."
+        else
+          echo "PR OK"
         fi
