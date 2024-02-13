@@ -44,9 +44,9 @@ jobs:
             # Verificar se o arquivo contém uma declaração CREATE TABLE
             if grep -qiE 'CREATE TABLE' "$arquivo"; then
               # Se o arquivo tiver mais de um commit, configurar a variável
-              if [ "$contagem_commits" -gt 1 ]; then
+              if [ "$contagem_commits" -lt 2 ]; then
                 #echo "######################### entrou no laço"
-                mais_de_um_commit=true
+                #mais_de_um_commit=true
                 # Validar se há mais de um commit em pelo menos um arquivo
                 if [ "$mais_de_um_commit" == false ]; then
                 echo "Erro: O pull request não tem mais de um commit. Crie um novo PR para garantir a ordem de execução"
