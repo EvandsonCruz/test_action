@@ -1,0 +1,65 @@
+name: Validar Commits nos Arquivos SQL
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+jobs:
+  validar-commits:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Obter lista de arquivos alterados
+      run: |
+        # Obter a lista de arquivos alterados no pull request
+        arquivos_alterados=($(git diff --name-only HEAD^1))
+
+        # Contar o número de arquivos no pull request
+        contagem_arquivos=${#arquivos_alterados[@]}
+
+        echo "::set-output name=contagem_arquivos::$contagem_arquivos"
+
+    - name: Validar Commits nos Arquivos SQL
+      run: |
+        contagem_arquivos=${{ needs.obter-arquivos.outputs.contagem_arquivos }}
+
+        # Verificar se há mais de um arquivo no pull request
+        if [ "$contagem_arquivos" -gt 1 ]; then
+          # Obter a lista de arquivos SQL no pull request
+          arquivos_sql=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.sql$'))
+
+          # Inicializar uma variável para rastrear se há mais de um commit
+          mais_de_um_commit=false
+
+          for arquivo_sql in "${arquivos_sql[@]}"; do
+            # Verificar se o arquivo contém uma declaração CREATE TABLE
+            if grep -qE 'CREATE TABLE' "$arquivo_sql"; then
+              # Obter a contagem de commits para o arquivo específico
+              contagem_commits=$(git rev-list --count HEAD $arquivo_sql)
+
+              # Se o arquivo tiver mais de um commit, configurar a variável
+              if [ "$contagem_commits" -gt 1 ]; then
+                mais_de_um_commit=true
+                break  # Não precisamos verificar os outros arquivos se já encontramos mais de um commit
+              fi
+            fi
+          done
+
+          # Validar se há mais de um commit em pelo menos um arquivo
+          if [ "$mais_de_um_commit" == true ]; then
+            echo "Erro: O pull request tem mais de um commit em pelo menos um arquivo SQL com uma declaração CREATE TABLE."
+            exit 1
+          else
+            echo "O pull request não tem mais de um commit em nenhum arquivo SQL com uma declaração CREATE TABLE."
+          fi
+        else
+          echo "Não há mais de um arquivo no pull request. Não é necessário validar commits nos arquivos SQL."
+        fi
