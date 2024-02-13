@@ -43,11 +43,6 @@ jobs:
           for arquivo in "${arquivos[@]}"; do
             # Verificar se o arquivo contém uma declaração CREATE TABLE
             if grep -qiE 'CREATE TABLE' "$arquivo"; then
-              # Obter a contagem de commits para o arquivo específico
-             
-
-             
-
               # Se o arquivo tiver mais de um commit, configurar a variável
               if [ "$contagem_commits" -gt 1 ]; then
                 echo "######################### entrou no laço"
@@ -58,12 +53,9 @@ jobs:
           done
 
           # Validar se há mais de um commit em pelo menos um arquivo
-          if [ "$mais_de_um_commit" == true ]; then
-            echo "Erro: O pull request tem mais de um commit em pelo menos um arquivo SQL com uma declaração CREATE TABLE."
+          if [ "$mais_de_um_commit" == false ]; then
+            echo "Erro: O pull request não tem mais de um commit. Crie um novo PR para garantir a ordem de execução"
             exit 1
           else
-            echo "O pull request não tem mais de um commit em nenhum arquivo SQL com uma declaração CREATE TABLE."
+            echo "O pull request tem mais de um commit."
           fi
-        else
-          echo "Não há mais de um arquivo no pull request. Não é necessário validar commits nos arquivos SQL."
-        fi
