@@ -34,9 +34,9 @@ jobs:
           # Inicializar uma variável para rastrear se há mais de um commit
           mais_de_um_commit=false
 
-          for arquivo_sql in "${arquivos_sql[@]}"; do
+          for arquivo in "${arquivos[@]}"; do
             # Verificar se o arquivo contém uma declaração CREATE TABLE
-            if grep -qE 'CREATE TABLE' "$arquivo_sql"; then
+            if grep -qE 'CREATE TABLE' "$arquivo"; then
               # Obter a contagem de commits para o arquivo específico
               contagem_commits=$(git rev-list --count HEAD)
 
