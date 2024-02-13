@@ -42,7 +42,7 @@ jobs:
 
           for arquivo in "${arquivos[@]}"; do
             # Verificar se o arquivo contém uma declaração CREATE TABLE
-            if grep -qE 'CREATE TABLE' "$arquivo"; then
+            if grep -qiE 'CREATE TABLE' "$arquivo"; then
               # Obter a contagem de commits para o arquivo específico
              
 
