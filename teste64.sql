@@ -1,1 +1,1 @@
-create tabl ab.teste;
+create table ab.teste;
