@@ -50,6 +50,7 @@ jobs:
 
               # Se o arquivo tiver mais de um commit, configurar a variável
               if [ "$contagem_commits" -gt 1 ]; then
+                echo "######################### entrou no laço"
                 mais_de_um_commit=true
                 break  # Não precisamos verificar os outros arquivos se já encontramos mais de um commit
               fi
