@@ -25,17 +25,11 @@ jobs:
 
         # Contar o número de arquivos no pull request
         contagem_arquivos=${#arquivos_alterados[@]}
-        echo "contagem_arquivos=$contagem_arquivos" >> $GITHUB_ENV
-
-    - name: Validar Commits nos Arquivos SQL
-      run: |
-        set -x
-        contagem_arquivos=${{ needs.obter-arquivos.outputs.contagem_arquivos }}
-
+  
         # Verificar se há mais de um arquivo no pull request
         if [ "$contagem_arquivos" -gt 1 ]; then
           # Obter a lista de arquivos SQL no pull request
-          arquivos_sql=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '\.sql$'))
+          arquivos=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }}))
 
           # Inicializar uma variável para rastrear se há mais de um commit
           mais_de_um_commit=false
