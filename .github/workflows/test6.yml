@@ -27,7 +27,7 @@ jobs:
         contagem_arquivos=${#arquivos_alterados[@]}
   
         # Verificar se há mais de um arquivo no pull request
-        if [ "$contagem_arquivos" -gt 1 ]; then
+        if [ "##################################################### $contagem_arquivos" -gt 1 ]; then
           # Obter a lista de arquivos SQL no pull request
           arquivos=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }}))
 
