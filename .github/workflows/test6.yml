@@ -19,7 +19,7 @@ jobs:
 
     - name: Obter lista de arquivos alterados
       run: |
-        set x
+        set -x
         # Obter a lista de arquivos alterados no pull request
         arquivos_alterados=($(git diff --name-only HEAD^1))
 
@@ -28,7 +28,7 @@ jobs:
 
     - name: Validar Commits nos Arquivos SQL
       run: |
-        set x
+        set -x
         contagem_arquivos=${{ needs.obter-arquivos.contagem_arquivos }}
 
         # Verificar se há mais de um arquivo no pull request
