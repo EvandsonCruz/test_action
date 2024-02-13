@@ -38,7 +38,7 @@ jobs:
             # Verificar se o arquivo contém uma declaração CREATE TABLE
             if grep -qE 'CREATE TABLE' "$arquivo_sql"; then
               # Obter a contagem de commits para o arquivo específico
-              contagem_commits=$(git rev-list --count HEAD $arquivo_sql)
+              contagem_commits=$(git rev-list --count HEAD)
 
               # Se o arquivo tiver mais de um commit, configurar a variável
               if [ "$contagem_commits" -gt 1 ]; then
