@@ -68,7 +68,7 @@ jobs:
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-          O pull request tem create table, mais de um arquivo, porém não tem mais de um commit. Crie um novo PR para garantir a ordem de execução.
+          O pull request tem create table, mais de um arquivo, porém não tem mais de um commit. Crie um novo PR fazendo commits separados para garantir a ordem de execução e suas dependências.
           Por favor revisar."
         else
           echo "PR OK"
