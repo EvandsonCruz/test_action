@@ -70,6 +70,7 @@ jobs:
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
           O pull request tem create table e mais de um arquivo, porém não tem mais de um commit.
           Crie um novo PR fazendo commits separados para garantir a ordem de execução e suas dependências."
+          gh pr close ${{ github.event.number }}
         else
           echo "PR OK"
         fi
