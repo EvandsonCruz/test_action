@@ -1,0 +1,47 @@
+name: identifier too long
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+    paths-ignore:
+      - '.github/workflows/**'
+
+jobs:
+  validar-identificador:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Configurar variável de ambiente GH_TOKEN
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
+
+    - name: Obter conteúdo do pull request
+      id: obter-conteudo
+      run: |
+
+        # Obtém a lista de arquivos adicionados no pull request
+        arquivos_adicionados=($(git diff --name-only HEAD^1))
+
+        if [ "$arquivos_adicionados" -gt 0 ]; then
+          echo "::warning::Grande quantidade de arquivos sendo alterados"
+          SLACK_MESSAGE="Grande quantidade de arquivos sendo alterados no PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+          Grande quantidade de arquivos sendo alterados
+          Por favor revisar a branch comparada"
+          exit 1
+        else
+          echo "Quantidade objetos alterados dentro do esperado"
+        fi
