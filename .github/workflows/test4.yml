@@ -36,7 +36,7 @@ jobs:
 
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Validando arquivo adicionado: $arquivo"
-          identificador=$(grep -Eo '[[:alpha:]_]{31,}' "$arquivo" | head -n 1)  # Pega apenas a primeira ocorrência
+          identificador=$(grep -Eo '\.[[:alpha:]_]{31,}' "$arquivo" | head -n 1 | sed 's/\.//')  # Pega apenas a primeira ocorrência
 
           if [ -n "$identificador" ]; then
             echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
