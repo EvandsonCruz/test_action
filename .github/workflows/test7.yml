@@ -1,5 +1,4 @@
-name: identifier too long
-
+name: quantidade arquivos
 on:
   pull_request:
     types:
@@ -11,7 +10,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  validar-identificador:
+  validar-quantidade:
     runs-on: ubuntu-latest
 
     steps:
