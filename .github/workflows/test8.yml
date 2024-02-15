@@ -39,7 +39,7 @@ jobs:
           check=$(grep -Eo ';/' "$arquivo")  
 
           if [ -n "$check" ]; then
-            echo "O PR tem ;/ no arquivo $arquivo. Isso pode causar erro por tentativa de execução duplicada"
+            echo "O PR tem ; e / no arquivo $arquivo. Isso pode causar erro por tentativa de execução duplicada"
             encontrada=true
             saida+="$saida$arquivo"$'\n'
             #echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
@@ -52,7 +52,7 @@ jobs:
         #echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
         if [ "$encontrada" == true ]; then
-          echo "::error::Existe PR que tem ;/ no arquivo $arquivo. Isso pode causar uma execução dupla"
+          echo "::error::Existe PR que tem ; e / no arquivo $arquivo. Isso pode causar erro por tentativa de execução duplicada"
           SLACK_MESSAGE="Existe PR que tem ;/ PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
@@ -60,7 +60,9 @@ jobs:
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-          ${saida}Por favor revisar."
+          Existe PR que tem ; e / 
+          Isso pode causar erro por tentativa de execução duplicada
+          ${saida}Por favor revisar, manter somente a /"
           exit 1
         else
           echo "PR OK"
