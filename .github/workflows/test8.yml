@@ -31,17 +31,17 @@ jobs:
         arquivos_adicionados=($(git diff --name-only HEAD^1))
         #echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
 
-        tem=false  # Inicializa encontrada como falso fora do loop
+        encontrada=false  # Inicializa encontrada como falso fora do loop
         check=""  # Inicializa a variável de saída
 
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Validando arquivo adicionado: $arquivo"
           check=$(grep -Eo ';/')  
 
-          if [ -n "$identificador" ]; then
-            echo "Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo: $arquivo"
+          if [ -n "$check" ]; then
+            echo "O PR tem ;/ no arquivo $arquivo. Isso pode causar erro por tentativa de execução duplicada"
             encontrada=true
-            saida+="Identificador de objeto ${identificador} com mais de 30 caracteres no arquivo $arquivo"$'\n'
+            saida+="$saida$arquivo"$'\n'
             #echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
           fi
 
@@ -52,8 +52,8 @@ jobs:
         #echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
         if [ "$encontrada" == true ]; then
-          echo "::error::Encontrado identificador de objeto com mais de 30 caracteres"
-          SLACK_MESSAGE="Identifier too long PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+          echo "::error::Existe PR que tem ;/ no arquivo $arquivo. Isso pode causar uma execução dupla"
+          SLACK_MESSAGE="Existe PR que tem ;/ PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
@@ -63,5 +63,5 @@ jobs:
           ${saida}Por favor revisar."
           exit 1
         else
-          echo "Não encontrado identificador de objeto com mais de 30 caracteres"
+          echo "PR OK"
         fi
