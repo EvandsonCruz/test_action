@@ -1,4 +1,4 @@
-name: identifier too long
+name: ponto e virgula e barra
 
 on:
   pull_request:
