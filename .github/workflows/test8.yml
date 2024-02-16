@@ -37,7 +37,7 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Validando arquivo adicionado: $arquivo"
           check=$(grep -Eo ';/' "$arquivo")
-          check2=$(grep -Eo ';/' "$arquivo")
+          check2=$(grep -Eo ';\n/' "$arquivo")
 
           if [ -n "$check" ] || [ -n "$check2" ]; then
             echo "O arquivo $arquivo tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
