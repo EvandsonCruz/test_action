@@ -39,14 +39,7 @@ jobs:
           check=$(grep -E ';/' "$arquivo")
           check2=$(grep -E ';\n/' "$arquivo")
 
-          if [ -n "$check" ]; then
-            echo "O arquivo $arquivo tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
-            encontrada=true
-            saida+="$saida$arquivo"$'\n'
-            #echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
-          fi
-
-          if [ -n "$check2" ]; then
+          if [ -n "$check" ] || [ -n "$check2" ]; then
             echo "O arquivo $arquivo tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
             encontrada=true
             saida+="$saida$arquivo"$'\n'
