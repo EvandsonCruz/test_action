@@ -30,7 +30,7 @@ jobs:
         # Obtém a lista de arquivos adicionados no pull request
         arquivos_adicionados=($(git diff --name-only HEAD^1))
         #echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
-
+        set -x
         encontrada=false  # Inicializa encontrada como falso fora do loop
         check=""  # Inicializa a variável de saída
 
