@@ -38,7 +38,7 @@ jobs:
           echo "Validando arquivo adicionado: $arquivo"
           check=$(grep -Pzo '.*;\n*/.*' "$arquivo")
 
-            if [ -n "$check" ]; then
+            if [ "$check" != ""]; then
             echo "O arquivo $arquivo tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
             encontrada=true
             saida+="$saida$arquivo"$'\n'
