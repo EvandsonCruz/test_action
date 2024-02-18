@@ -35,7 +35,7 @@ jobs:
         check=""  # Inicializa a variável de saída
 
         for arquivo in "${arquivos_adicionados[@]}"; do
-          if grep -Ei -q 'create (table|index)' "$arquivo"; then
+          if grep -Ei -q '(create|alter) (table|index)' "$arquivo"; then
           echo "Validando arquivo adicionado: $arquivo"
           check=$(awk '/;.*$/{flag=1; next} /\/$/{if(flag){print "Encontrado ;/ no arquivo"}} {flag=0}' "$arquivo")
           if [[ -n "$check" ]]; then
