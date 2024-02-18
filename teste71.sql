@@ -1,1 +1,2 @@
 ALTER TABLE AB.TESTE;
+/
