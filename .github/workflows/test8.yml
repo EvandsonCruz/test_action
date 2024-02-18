@@ -35,20 +35,17 @@ jobs:
         check=""  # Inicializa a variável de saída
 
         for arquivo in "${arquivos_adicionados[@]}"; do
+          if grep -Ei -q 'create (table|index)' "$arquivo"; then
           echo "Validando arquivo adicionado: $arquivo"
           check=$(awk '/;.*$/{flag=1; next} /\/$/{if(flag){print "Encontrado ;/ no arquivo"}} {flag=0}' "$arquivo")
-         if [[ -n "$check" ]]; then
+          if [[ -n "$check" ]]; then
             echo "O arquivo $arquivo tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
             encontrada=true
             saida+="$saida$arquivo"$'\n'
             #echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
           fi
-
-          #echo "##########################contagem depois do if###################################  $contagem"
-          
+         fi 
         done
-       
-        #echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
         if [ "$encontrada" == true ]; then
           echo "::error::Existe arquivo no PR que tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
