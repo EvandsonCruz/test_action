@@ -5,3 +5,5 @@ CREATE TABLE ot.persons(
     PRIMARY KEY(person_id)
 );
 /
+alter table add;
+/
