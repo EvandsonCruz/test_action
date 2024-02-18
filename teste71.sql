@@ -18,5 +18,3 @@ CREATE INDEX idx_nome ON exemplo_tabela(nome);
 
 -- Concessão de permissões
 GRANT SELECT, INSERT, UPDATE, DELETE ON exemplo_tabela TO usuario_exemplo;
-/
-
