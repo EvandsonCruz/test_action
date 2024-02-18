@@ -36,11 +36,7 @@ jobs:
 
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Validando arquivo adicionado: $arquivo"
-          echo -e ';\n/' > temp_regex
-          # Fazer a pesquisa com grep usando a expressão regular do arquivo temporário
-          check=$(grep -E -f temp_regex "$arquivo")
-          # Remover o arquivo temporário
-         rm temp_regex
+          check=$(grep -P ';.*?/' "$arquivo")
          if [[ -n "$check" ]]; then
             echo "O arquivo $arquivo tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
             encontrada=true
