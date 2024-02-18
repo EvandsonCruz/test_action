@@ -1,3 +1,1 @@
-create table ab.teste;
-grant
-/
+create table ab.teste;/
