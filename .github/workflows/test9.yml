@@ -58,7 +58,7 @@ jobs:
                   done
                 fi
               done
-          
+          done
           echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
           if [ "$encontrada" == false ]; then
