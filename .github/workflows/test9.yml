@@ -61,7 +61,7 @@ jobs:
           done
           echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
-          if [ "$encontrada" == false ]; then
+          if [ "$encontrada" == true ]; then
           echo "::error::Criação de índice sem tablespace"
           SLACK_MESSAGE="Criação de índice sem tablespace no PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
