@@ -1,0 +1,97 @@
+name: index tablespace
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+    paths-ignore:
+      - '.github/workflows/**'
+
+jobs:
+  validar-fim-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Configurar variável de ambiente GH_TOKEN
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
+
+    - name: Obter conteúdo do pull request
+      id: obter-conteudo
+      run: |
+
+          palavras_chave=("create index")  # Substitua pela lista de palavras-chave desejada
+          outras_palavras=("tablespace")  # Substitua pela segunda lista de palavras 
+
+          encontrada=true 
+          saida=""
+
+          echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
+          echo "#############################################################  ${{ github.event_name }}"
+          echo "##########################opened###################################  ${{ github.event.action }}"
+          
+          if [ "${{ github.event.action }}" == "opened" ]; then
+            echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+
+            # Obtém a lista de arquivos adicionados no pull request
+            arquivos_adicionados=($(git diff --name-only HEAD^1))
+            echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
+
+            for arquivo in "${arquivos_adicionados[@]}"; do
+              echo "Novo arquivo adicionado: $arquivo"
+
+              # Restante do seu código para verificar palavras-chave e outras_palavras
+              for palavra_chave in "${palavras_chave[@]}"; do
+                if grep -q "$palavra_chave" "$arquivo"; then
+                  echo "Encontrada a palavra '$palavra_chave' no novo arquivo: $arquivo"
+                  for outra_palavra in "${outras_palavras[@]}"; do
+                    if grep -q "$outra_palavra" "$arquivo"; then
+                      echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
+                      encontrada=true
+                      saida="$saida$palavra_chave $outra_palavra no arquivo $arquivo\n"
+                    fi
+                  done
+                fi
+              done
+            done
+          else 
+            for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+              for palavra_chave in "${palavras_chave[@]}"; do
+                if grep -q "$palavra_chave" "$arquivo"; then
+                  echo "Encontrada a palavra '$palavra_chave' no arquivo: $arquivo"
+                  for outra_palavra in "${outras_palavras[@]}"; do
+                    if grep -q "$outra_palavra" "$arquivo"; then
+                      echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
+                      encontrada=false
+                      saida="$saida$palavra_chave $outra_palavra no arquivo $arquivo\n"
+                    fi
+                  done
+                fi
+              done
+            done
+          fi
+          
+          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
+
+          if [ "$encontrada" == false ]; then
+          echo "::error::Criação de índice sem tablespace"
+          SLACK_MESSAGE="Criação de índice sem tablespace no PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+          Criação de índice sem tablespace
+          ${saida}
+          Por favor revisar."
+          exit 1
+          else
+          echo "PR OK"
+          fi
