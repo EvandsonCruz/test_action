@@ -51,8 +51,9 @@ jobs:
                   echo "Encontrada a palavra '$palavra_chave' no novo arquivo: $arquivo"
                   for outra_palavra in "${outras_palavras[@]}"; do
                     if grep -q "$outra_palavra" "$arquivo"; then
+                     encontrada=false
+                    else
                       echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                      encontrada=false
                       saida="$saida$palavra_chave $outra_palavra no arquivo $arquivo"$'\n'
                     fi
                   done
@@ -71,8 +72,7 @@ jobs:
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
           Criação de índice sem tablespace
-          ${saida}
-          Por favor revisar."
+          ${saida}Por favor revisar."
           exit 1
           else
           echo "PR OK"
