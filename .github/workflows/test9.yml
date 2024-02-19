@@ -54,7 +54,7 @@ jobs:
                      encontrada=false
                     else
                       echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                      saida="$saida$palavra_chave $outra_palavra no arquivo $arquivo"$'\n'
+                      saida="$arquivo"$'\n'
                     fi
                   done
                 fi
