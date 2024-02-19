@@ -53,7 +53,7 @@ jobs:
                   for outra_palavra in "${outras_palavras[@]}"; do
                     if grep -q "$outra_palavra" "$arquivo"; then
                       echo "Encontrada a palavra '$outra_palavra' no mesmo arquivo: $arquivo"
-                      encontrada=true
+                      encontrada=false
                       saida="$saida$palavra_chave $outra_palavra no arquivo $arquivo"$'\n'
                     fi
                   done
