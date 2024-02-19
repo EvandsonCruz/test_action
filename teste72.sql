@@ -1,1 +1,1 @@
-create index ab.teste tablespace teste;
+create table ab.teste;
