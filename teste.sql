@@ -1,8 +1,8 @@
 WITH RunningJobs AS (
     SELECT 
         rd.job_name,
-        EXTRACT(SECOND FROM rd.run_duration) AS run_duration_seconds,
-        rd.actual_start_date,
+        rd.run_duration,
+        actual_start_date,
         ROW_NUMBER() OVER (PARTITION BY rd.job_name ORDER BY rd.actual_start_date DESC) AS rn
     FROM 
         dba_scheduler_job_run_details rd
@@ -14,7 +14,7 @@ WITH RunningJobs AS (
 )
 SELECT
     job_name,
-    AVG(run_duration_seconds) AS avg_run_duration_seconds
+    AVG(EXTRACT(DAY FROM run_duration) * 86400 + EXTRACT(HOUR FROM run_duration) * 3600 + EXTRACT(MINUTE FROM run_duration) * 60 + EXTRACT(SECOND FROM run_duration)) AS avg_run_duration_seconds
 FROM
     RunningJobs
 WHERE
