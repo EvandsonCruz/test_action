@@ -1,13 +1,16 @@
 WITH RunningJobs AS (
     SELECT 
-        job_name,
-        EXTRACT(SECOND FROM run_duration) AS run_duration_seconds,
-        actual_start_date,
-        ROW_NUMBER() OVER (PARTITION BY job_name ORDER BY actual_start_date DESC) AS rn
+        rd.job_name,
+        EXTRACT(SECOND FROM rd.run_duration) AS run_duration_seconds,
+        rd.actual_start_date,
+        ROW_NUMBER() OVER (PARTITION BY rd.job_name ORDER BY rd.actual_start_date DESC) AS rn
     FROM 
-        dba_scheduler_job_run_details
+        dba_scheduler_job_run_details rd
+    JOIN
+        dba_scheduler_jobs j ON rd.job_name = j.job_name
     WHERE
-        end_date IS NULL  -- Adicione esta condição para incluir apenas jobs em execução
+        j.end_date IS NULL
+        AND j.state = 'RUNNING'
 )
 SELECT
     job_name,
@@ -18,3 +21,4 @@ WHERE
     rn <= 3
 GROUP BY
     job_name;
+
