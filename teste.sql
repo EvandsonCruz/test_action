@@ -18,11 +18,13 @@ WITH Last3RunDurations AS (
         job_name
 )
 SELECT
-    r.job_name,
-    r.run_duration AS current_run_duration,
+    j.job_name,
+    j.run_duration AS current_run_duration,
     ard.avg_run_duration_seconds,
-    CASE WHEN EXTRACT(DAY FROM r.run_duration) * 86400 + EXTRACT(HOUR FROM r.run_duration) * 3600 + EXTRACT(MINUTE FROM r.run_duration) * 60 + EXTRACT(SECOND FROM r.run_duration) > ard.avg_run_duration_seconds THEN 'Above Average' ELSE 'Below or Equal Average' END AS run_duration_status
+    CASE WHEN EXTRACT(DAY FROM j.run_duration) * 86400 + EXTRACT(HOUR FROM j.run_duration) * 3600 + EXTRACT(MINUTE FROM j.run_duration) * 60 + EXTRACT(SECOND FROM j.run_duration) > ard.avg_run_duration_seconds THEN 'Above Average' ELSE 'Below or Equal Average' END AS run_duration_status
 FROM
-    dba_scheduler_running_jobs r
+    dba_scheduler_job_run_details j
 JOIN
-    AvgRunDuration ard ON r.job_name = ard.job_name;
+    AvgRunDuration ard ON j.job_name = ard.job_name
+WHERE
+    j.actual_start_date = (SELECT MAX(actual_start_date) FROM Last3RunDurations WHERE job_name = j.job_name);
