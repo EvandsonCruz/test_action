@@ -25,50 +25,28 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-        palavras_chave=("create index")  # Substitua pela lista de palavras-chave desejada
-        outras_palavras=("tablespace")  # Substitua pela segunda lista de palavras 
+        palavras_chave=("create index" "tablespace")  # Substitua pela lista de palavras-chave desejada
 
-        encontrada=true 
+        encontrada=false
         saida=""
 
-        echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
-        echo "#############################################################  ${{ github.event_name }}"
-        echo "##########################opened###################################  ${{ github.event.action }}"
-        
         echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
         # Obtém a lista de arquivos adicionados no pull request
         arquivos_adicionados=($(git diff --name-only HEAD^1))
-        echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
+        echo "Arquivos adicionados: ${arquivos_adicionados[@]}"
 
         for arquivo in "${arquivos_adicionados[@]}"; do
-          echo "Novo arquivo adicionado: $arquivo"
+          echo "Verificando o arquivo: $arquivo"
 
-          # Restante do seu código para verificar palavras-chave e outras_palavras
-          for palavra_chave in "${palavras_chave[@]}"; do
-            if grep -q "$palavra_chave" "$arquivo"; then
-              echo "Encontrada a palavra '$palavra_chave' no novo arquivo: $arquivo"
-              
-              # Verificar se a outra palavra-chave está presente no mesmo bloco do CREATE INDEX
-              encontrada_outra_palavra=false
-              while IFS= read -r linha; do
-                if [[ "$linha" == "create index"* ]]; then
-                  encontrada_outra_palavra=true
-                elif [ "$encontrada_outra_palavra" == true ] && [[ "$linha" == *"tablespace"* ]]; then
-                  encontrada_outra_palavra=false
-                fi
-              done < "$arquivo"
-
-              if [ "$encontrada_outra_palavra" == false ]; then
-                echo "Encontrada a palavra 'tablespace' para o CREATE INDEX no mesmo arquivo: $arquivo"
-                encontrada=false
-                saida="$saida$arquivo"$'\n'
-              fi
-            fi
-          done
+          # Utilizando grep para verificar as palavras-chave em sequência
+          if grep -qE "create index.*tablespace" "$arquivo"; then
+            echo "Encontradas as palavras-chave no mesmo arquivo: $arquivo"
+            encontrada=true
+          else
+            saida="$saida$arquivo"$'\n'
+          fi
         done
-
-        echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
         if [ "$encontrada" == false ]; then
           echo "::error::Criação de índice sem tablespace"
@@ -83,6 +61,6 @@ jobs:
         else
           echo "PR OK"
         fi
-        done
+        fi
         fi
         fi
