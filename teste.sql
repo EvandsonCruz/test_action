@@ -1,10 +1,10 @@
 WITH Last3RunDurations AS (
     SELECT 
-        rd.job_name,
-        rd.run_duration,
-        ROW_NUMBER() OVER (PARTITION BY rd.job_name ORDER BY rd.actual_start_date DESC) AS rn
+        job_name,
+        run_duration,
+        ROW_NUMBER() OVER (PARTITION BY job_name ORDER BY actual_start_date DESC) AS rn
     FROM 
-        dba_scheduler_job_run_details rd
+        dba_scheduler_job_run_details
     WHERE
         rn <= 3
 )
@@ -27,4 +27,4 @@ FROM
 JOIN
     AvgRunDuration ard ON j.job_name = ard.job_name
 WHERE
-    j.actual_start_date = (SELECT MAX(actual_start_date) FROM Last3RunDurations WHERE job_name = j.job_name);
+    j.actual_start_date = (SELECT MAX(actual_start_date) FROM Last3RunDurations WHERE job_name = j.job_name AND rn = 1);
