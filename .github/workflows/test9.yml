@@ -86,3 +86,6 @@ jobs:
           echo "PR OK"
         fi
         fi
+        done
+        fi
+        fi
