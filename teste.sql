@@ -12,13 +12,26 @@ WITH RunningJobs AS (
         j.end_date IS NULL
         AND j.state = 'RUNNING'
 )
+, AvgRunDuration AS (
+    SELECT
+        job_name,
+        AVG(EXTRACT(DAY FROM run_duration) * 86400 + EXTRACT(HOUR FROM run_duration) * 3600 + EXTRACT(MINUTE FROM run_duration) * 60 + EXTRACT(SECOND FROM run_duration)) AS avg_run_duration_seconds
+    FROM
+        RunningJobs
+    WHERE
+        rn <= 3
+    GROUP BY
+        job_name
+)
 SELECT
-    job_name,
-    AVG(EXTRACT(DAY FROM run_duration) * 86400 + EXTRACT(HOUR FROM run_duration) * 3600 + EXTRACT(MINUTE FROM run_duration) * 60 + EXTRACT(SECOND FROM run_duration)) AS avg_run_duration_seconds
+    r.job_name,
+    r.run_duration,
+    r.actual_start_date,
+    ard.avg_run_duration_seconds,
+    CASE WHEN EXTRACT(DAY FROM r.run_duration) * 86400 + EXTRACT(HOUR FROM r.run_duration) * 3600 + EXTRACT(MINUTE FROM r.run_duration) * 60 + EXTRACT(SECOND FROM r.run_duration) > ard.avg_run_duration_seconds THEN 'Above Average' ELSE 'Below or Equal Average' END AS run_duration_status
 FROM
-    RunningJobs
+    RunningJobs r
+JOIN
+    AvgRunDuration ard ON r.job_name = ard.job_name
 WHERE
-    rn <= 3
-GROUP BY
-    job_name;
-
+    r.rn <= 3;
