@@ -25,6 +25,7 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
+        set -x
         palavras_chave=("create index")  # Substitua pela lista de palavras-chave desejada
         outras_palavras=("tablespace")  # Substitua pela segunda lista de palavras 
 
