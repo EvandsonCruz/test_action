@@ -85,5 +85,6 @@ jobs:
         else
           echo "PR OK"
         fi
+        done
         fi
         fi
