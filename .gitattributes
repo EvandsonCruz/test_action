@@ -1,1 +1,1 @@
-echo '*.txt encoding=utf-8' >> .gitattributes
+*.txt working-tree-encoding=us-ascii git-encoding=utf-8
