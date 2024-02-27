@@ -1,0 +1,5 @@
+* linguist-documentation: true
+* linguist-language: Generic
+*.sql linguist-language=sql
+* text=auto
+*.sql text eol=lf
