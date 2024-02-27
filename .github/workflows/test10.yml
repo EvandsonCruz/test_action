@@ -30,9 +30,6 @@ jobs:
        git config --get core.editor
        git config --get core.quotepath
        git config --get i18n.logoutputencoding  
-       git config --global core.autocrlf input
-       git config --global core.safecrlf true
-       git config --global core.filemode false
 
     - name: Obter lista de arquivos alterados
       run: |
