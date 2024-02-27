@@ -27,7 +27,7 @@ jobs:
 
         # Adicionar ação para validar encoding
         for arquivo in "${arquivos_alterados[@]}"; do
-          encoding_info=$(arquivo --mime-encoding "$arquivo")
+          encoding_info=$(file --mime-encoding "$arquivo")
           # Verificar se o encoding é UTF-8
         if [[ "$encoding_info" != *utf-8 ]]; then
         echo ">>>>>>>>>>>>>>>> $encoding_info"
