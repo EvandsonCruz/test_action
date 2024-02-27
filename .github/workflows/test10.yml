@@ -30,6 +30,7 @@ jobs:
           encoding_info=$(file --mime-encoding "$arquivo")
           # Verificar se o encoding é UTF-8
         if [[ "$encoding_info" != *utf-8 ]]; then
+        echo ">>>>>>>>>>>>>>>> $encoding_info"
         echo "::error::O arquivo $arquivo não está codificado como UTF-8."
         saida+="O arquivo $arquivo não está codificado como UTF-8"$'\n'
         encontrado=true
