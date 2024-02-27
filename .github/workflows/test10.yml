@@ -20,6 +20,9 @@ jobs:
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
+    - name: Install chardet
+      run: pip install chardet
+
     - name: Obter lista de arquivos alterados
       run: |
         # Obter a lista de arquivos alterados no pull request
