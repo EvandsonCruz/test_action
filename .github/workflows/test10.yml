@@ -20,12 +20,6 @@ jobs:
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
-    - name: Debug Git Config
-      run: |
-       set -x
-       git config --get core.autocrlf
-       git config --get core.safecrlf
-
     - name: Obter lista de arquivos alterados
       run: |
         # Obter a lista de arquivos alterados no pull request
@@ -33,7 +27,7 @@ jobs:
 
         # Adicionar ação para validar encoding
         for arquivo in "${arquivos_alterados[@]}"; do
-          encoding_info=$(enca -L none -g "$arquivo" | cut -d ':' -f 2)
+          encoding_info=$(--mime-encoding "$arquivo")
           # Verificar se o encoding é UTF-8
         if [[ "$encoding_info" != *utf-8 ]]; then
         echo ">>>>>>>>>>>>>>>> $encoding_info"
