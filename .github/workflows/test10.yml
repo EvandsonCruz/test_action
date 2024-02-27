@@ -25,11 +25,6 @@ jobs:
        set -x
        git config --get core.autocrlf
        git config --get core.safecrlf
-       git config --get core.filemode
-       git config --get core.ignorecase
-       git config --get core.editor
-       git config --get core.quotepath
-       git config --get i18n.logoutputencoding  
 
     - name: Obter lista de arquivos alterados
       run: |
