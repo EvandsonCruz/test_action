@@ -1,1 +1,1 @@
-*.txt working-tree-encoding=us-ascii git-encoding=utf-8
+*.txt working-tree-encoding=utf-8 git-encoding=utf-8
