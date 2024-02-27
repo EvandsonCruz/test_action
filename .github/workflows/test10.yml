@@ -22,6 +22,7 @@ jobs:
 
     - name: Debug Git Config
       run: |
+       set -x
        git config --get core.autocrlf
        git config --get core.safecrlf
        git config --get core.filemode
