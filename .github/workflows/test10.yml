@@ -18,7 +18,20 @@ jobs:
         fetch-depth: 0
 
     - name: Configurar variável de ambiente GH_TOKEN
-      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
+
+    - name: Debug Git Config
+      run: |
+       git config --get core.autocrlf
+       git config --get core.safecrlf
+       git config --get core.filemode
+       git config --get core.ignorecase
+       git config --get core.editor
+       git config --get core.quotepath
+       git config --get i18n.logoutputencoding  
+       git config --global core.autocrlf input
+       git config --global core.safecrlf true
+       git config --global core.filemode false
 
     - name: Obter lista de arquivos alterados
       run: |
