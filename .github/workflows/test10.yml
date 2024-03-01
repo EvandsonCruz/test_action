@@ -32,7 +32,7 @@ jobs:
 
         # Adicionar ação para validar encoding
         for arquivo in "${arquivos_alterados[@]}"; do
-          encoding_info=$(chardet "$arquivo" | jq -r '.encoding')
+          encoding_info=$(chardet "$arquivo" | jq -r '.encoding // empty')
           
           if [ "$encoding_info" != "utf-8" ]; then
           echo ">>>>>>>>>>>>>>>> $encoding_info"
