@@ -20,10 +20,8 @@ jobs:
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
-    - name: Instalar chardet
-      run: pip install chardet
-      if: runner.os == 'Linux'
-
+    - name: Instalar uchardet
+      run: sudo apt-get install -y uchardet
 
     - name: Obter lista de arquivos alterados
       run: |
@@ -33,7 +31,7 @@ jobs:
         # Adicionar ação para validar encoding
         for arquivo in "${arquivos_alterados[@]}"; do
           #encoding_info=$(chardetect "$arquivo" | cut -d ' ' -f 2)
-          encoding_info=$(file -i "$arquivo" | awk -F '=' '{print $2}')
+          encoding_info=$(uchardet "$arquivo")
           
           if [ "$encoding_info" != "utf-8" ]; then
           echo ">>>>>>>>>>>>>>>> $encoding_info"
