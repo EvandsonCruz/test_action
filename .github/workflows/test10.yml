@@ -20,6 +20,11 @@ jobs:
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
+    - name: Instalar chardet
+      run: pip install chardet
+      if: runner.os == 'Linux'
+
+
     - name: Obter lista de arquivos alterados
       run: |
         # Obter a lista de arquivos alterados no pull request
@@ -27,9 +32,9 @@ jobs:
 
         # Adicionar ação para validar encoding
         for arquivo in "${arquivos_alterados[@]}"; do
-          encoding_info=$(iconv -f UTF-8 -t ASCII//TRANSLIT//IGNORE "$arquivo" 2>/dev/null || echo "us-ascii")
+          encoding_info=$(chardet "$arquivo" | jq -r '.encoding')
           # Verificar se o encoding é UTF-8
-        if [[ "$encoding_info" != *utf-8 ]]; then
+        if [[ "$encoding_info" != "utf-8" ]]; then
         echo ">>>>>>>>>>>>>>>> $encoding_info"
         echo "::error::O arquivo $arquivo não está codificado como UTF-8."
         saida+="O arquivo $arquivo não está codificado como UTF-8"$'\n'
