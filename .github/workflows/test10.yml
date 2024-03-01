@@ -33,14 +33,14 @@ jobs:
         # Adicionar ação para validar encoding
         for arquivo in "${arquivos_alterados[@]}"; do
           encoding_info=$(chardet "$arquivo" | jq -r '.encoding')
-          # Verificar se o encoding é UTF-8
-        if [[ "$encoding_info" != "utf-8" ]]; then
-        echo ">>>>>>>>>>>>>>>> $encoding_info"
-        echo "::error::O arquivo $arquivo não está codificado como UTF-8."
-        saida+="O arquivo $arquivo não está codificado como UTF-8"$'\n'
-        encontrado=true
-        fi
-        done
+          
+          if [ "$encoding_info" != "utf-8" ]; then
+          echo ">>>>>>>>>>>>>>>> $encoding_info"
+          echo "::error::O arquivo $arquivo não está codificado como UTF-8."
+          saida+="O arquivo $arquivo não está codificado como UTF-8"$'\n'
+          encontrado=true
+          fi
+           done
         
         if [ "$encontrada" == true ]; then
         SLACK_MESSAGE="UTF-8 Encoding Error PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})Existe arquivo que não está codificado como UTF-8.\n{{ $saida }}"
