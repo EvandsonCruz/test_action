@@ -22,6 +22,7 @@ jobs:
 
     - name: Converter arquivos para UTF-8
       run: |
+       set -x
        for arquivo in "${arquivos_alterados[@]}"; do
        # Converter o arquivo para UTF-8
        iconv -f any -t UTF-8 "$arquivo" > "${arquivo}.utf8"
@@ -31,6 +32,7 @@ jobs:
 
     - name: Obter lista de arquivos alterados
       run: |
+        set -x
         # Obter a lista de arquivos alterados no pull request
         arquivos_alterados=($(git diff --name-only HEAD^1))
 
