@@ -30,7 +30,7 @@ jobs:
 
         # Adicionar ação para validar encoding
         for arquivo in "${arquivos_alterados[@]}"; do
-          #encoding_info=$(chardetect "$arquivo" | cut -d ' ' -f 2)
+          #encoding_info=$(uchardet "$arquivo")
           encoding_info=$(file -i "$arquivo" | awk -F "=" '{print $2}' | tr -d ' ')
           
           if [ "$encoding_info" != "utf-8" ]; then
