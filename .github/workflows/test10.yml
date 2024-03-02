@@ -20,18 +20,6 @@ jobs:
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
-    - name: Instalar icu-devtools
-      run: sudo apt-get install -y icu-devtools
-
-    - name: Converter arquivos para UTF-8
-      run: |
-       for arquivo in "${arquivos_alterados[@]}"; do
-       # Converter o arquivo para UTF-8
-       uconv -f any -t UTF-8 -o "$arquivo.utf8" "$arquivo"
-       mv "$arquivo.utf8" "$arquivo"
-       done
-
-
     - name: Obter lista de arquivos alterados
       run: |
         set -x
@@ -43,7 +31,7 @@ jobs:
           #encoding_info=$(chardetect "$arquivo" | cut -d ' ' -f 2)
           encoding_info=$(file -i "$arquivo" | awk -F "=" '{print $2}' | tr -d ' ')
           
-          if [ "$encoding_info" != "utf-8" ]; then
+          if [ "$encoding_info" != "us-ascii" ]; then
           echo ">>>>>>>>>>>>>>>> $encoding_info"
           echo "::error::O arquivo $arquivo não está codificado como UTF-8."
           saida+="O arquivo $arquivo não está codificado como UTF-8"$'\n'
