@@ -20,15 +20,16 @@ jobs:
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
+    - name: Instalar enca
+      run: sudo apt-get install -y enca
+
     - name: Converter arquivos para UTF-8
       run: |
-       set -x
        for arquivo in "${arquivos_alterados[@]}"; do
        # Converter o arquivo para UTF-8
-       iconv -f any -t UTF-8 "$arquivo" > "${arquivo}.utf8"
-       # Substituir o arquivo original pelo convertido
-       mv "${arquivo}.utf8" "$arquivo"
+       enca -L none -x UTF-8 "$arquivo"
        done
+
 
     - name: Obter lista de arquivos alterados
       run: |
