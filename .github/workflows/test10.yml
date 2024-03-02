@@ -31,7 +31,7 @@ jobs:
           #encoding_info=$(chardetect "$arquivo" | cut -d ' ' -f 2)
           encoding_info=$(file -i "$arquivo" | awk -F "=" '{print $2}' | tr -d ' ')
           
-          if [ "$encoding_info" != "us-ascii"]; then
+          if [ "$encoding_info" != "us-ascii" ]; then
           echo ">>>>>>>>>>>>>>>> $encoding_info"
           echo "::error::O arquivo $arquivo não está codificado como UTF-8."
           saida+="$arquivo"$'\n'
