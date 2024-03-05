@@ -40,11 +40,11 @@ jobs:
           echo "Verificando o arquivo: $arquivo"
 
           # Utilizando grep para verificar as palavras-chave em sequência
-          if grep -qE "create index.*tablespace" "$arquivo"; then
-            echo "Encontradas as palavras-chave no mesmo arquivo: $arquivo"
+          if grep -q "create index" "$arquivo" | awk '/create index/ && !/tablespace/' > /dev/null; then
             encontrada=true
-          else
             saida="$saida$arquivo"$'\n'
+          else
+             echo "index OK"
           fi
         done
 
