@@ -26,8 +26,6 @@ jobs:
       id: obter-conteudo
       run: |
         set -x
-        palavras_chave=("create index" "tablespace")  # Substitua pela lista de palavras-chave desejada
-
         encontrada=false
         saida=""
 
