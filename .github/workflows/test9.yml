@@ -38,7 +38,6 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Verificando o arquivo: $arquivo"
 
-          # Utilizando grep para verificar as palavras-chave em sequência
           if awk '/create index/ && !/tablespace/' "$arquivo" | grep -q "."; then
             encontrada=true
             saida="$saida$arquivo"$'\n'
