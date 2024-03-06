@@ -25,7 +25,6 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-        set -x
         encontrada=false
         saida=""
 
@@ -60,4 +59,4 @@ jobs:
           exit 1
           else
           echo "PR OK"
-          fi
+        fi
