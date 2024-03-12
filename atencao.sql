@@ -6,3 +6,4 @@ create index ab.teste3 tablespace teste
 /
 
 --atenção
+comment on column teste 'atenção';
