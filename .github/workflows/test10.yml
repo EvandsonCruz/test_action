@@ -34,7 +34,7 @@ jobs:
           if [ "$encoding_info" != "us-ascii" ]; then
           echo ">>>>>>>>>>>>>>>> $encoding_info"
           echo "::error::O arquivo $arquivo não está codificado como UTF-8."
-          saida+="$arquivo"$'\n'
+          saida+=$(echo "$arquivo" | sed 's/"/\\"/g')$'\n'
           encontrado=true
           fi
           done
