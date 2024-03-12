@@ -41,7 +41,7 @@ jobs:
         
         if [ "$encontrado" == true ]; then
         SLACK_MESSAGE="UTF-8 Encoding Error PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})
-        Existe arquivo que não está codificado como UTF-8. @evandson.cruz"
+        Existe arquivo que não está codificado como UTF-8."
         curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
         PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
         REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
