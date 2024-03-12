@@ -34,7 +34,8 @@ jobs:
           if [ "$encoding_info" != "us-ascii" ]; then
           echo ">>>>>>>>>>>>>>>> $encoding_info"
           echo "::error::O arquivo $arquivo não está codificado como UTF-8."
-          saida+="$arquivo"$'\n'
+          nome_arquivo_codificado=$(python -c "import urllib.parse; print(urllib.parse.quote('''$arquivo'''))")
+          saida+="$nome_arquivo_codificado"$'\n'
           encontrado=true
           fi
            done
