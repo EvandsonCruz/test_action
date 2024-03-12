@@ -40,7 +40,7 @@ jobs:
           done
         
         if [ "$encontrado" == true ]; then
-        caractere_convertido=$(echo -e "$saida")
+        caractere_convertido=$(echo "$saida" | iconv -f UTF-8 -t UTF-8)
         SLACK_MESSAGE="UTF-8 Encoding Error PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})
         Existe arquivo que não está codificado como UTF-8.\n$caractere_convertido"
         curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -53,4 +53,5 @@ jobs:
         $saida Por favor, corrija o encoding e faça um novo commit."
         exit 1
         fi
+
         
