@@ -37,7 +37,7 @@ jobs:
           saida+="$arquivo"$'\n'
           encontrado=true
           fi
-           done
+          done
         
         if [ "$encontrado" == true ]; then
         SLACK_MESSAGE="UTF-8 Encoding Error PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})
