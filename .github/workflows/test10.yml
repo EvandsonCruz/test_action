@@ -51,7 +51,7 @@ jobs:
         AUTHOR_NAME=${{ github.event.pull_request.user.login }}
         gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
         Existe arquivo que não está codificado como UTF-8.
-        $saida Por favor, corrija o encoding e faça um novo commit."
+        $teste Por favor, corrija o encoding e faça um novo commit."
         exit 1
         fi
 
