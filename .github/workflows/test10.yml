@@ -32,31 +32,26 @@ jobs:
           encoding_info=$(file -i "$arquivo" | awk -F "=" '{print $2}' | tr -d ' ')
           
           if [ "$encoding_info" != "us-ascii" ] && [ "$encoding_info" != "utf-8" ]; then
-            echo ">>>>>>>>>>>>>>>> $encoding_info"
-            echo "::error::O arquivo $arquivo não está codificado como UTF-8."
-            saida+="$arquivo"$'\n'
-            encontrado=true
+          echo ">>>>>>>>>>>>>>>> $encoding_info"
+          echo "::error::Existe arquivo com caracteres especiais no PR"
+          saida+="$arquivo"$'\n'
+          encontrado=true
           fi
-        done
+          done
         
         if [ "$encontrado" == true ]; then
-          SLACK_MESSAGE="UTF-8 Encoding Error PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})
-          Existe arquivo que não está codificado como UTF-8."
-
-          # Modificado para lidar com caracteres especiais no nome do arquivo
-          SLACK_MESSAGE="$SLACK_MESSAGE\nArquivos com problemas:"
-          for arquivo in "${arquivos_alterados[@]}"; do
-            SLACK_MESSAGE="$SLACK_MESSAGE\n- $arquivo"
-          done
-
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-
-          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
-          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
-          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
-          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
-          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-          Existe arquivo que não está codificado como UTF-8.
-          Por favor, corrija o encoding e faça um novo commit."
-          exit 1
+        SLACK_MESSAGE="UTF-8 Encoding Error PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})
+        Existe arquivo com caracteres especiais no PR"
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+        PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+        REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+        REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+        AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+        gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+        Existe arquivo com caracteres especiais no PR.
+        Por favor, corrija o(s) arquivo(s) e faça um novo commit."
+        exit 1
         fi
+
+
+        
