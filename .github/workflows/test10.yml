@@ -21,6 +21,7 @@ jobs:
         run: |
           set -x
           branch=$(echo "${{ github.ref }}" | awk -F'/' '{print $NF}')
+          #commit_number=$(${{ github.sha }})
           # Obter a lista de arquivos alterados no push
           arquivos_alterados=($(git diff --name-only HEAD^1))
 
@@ -40,8 +41,7 @@ jobs:
             echo "Arquivo(s) com caracteres especiais encontrados. Commit bloqueado."
             
             # Enviar notificação para o Slack
-            SLACK_MESSAGE="Existe arquivo com caracteres especiais no push
-            github.com/${GITHUB_REPOSITORY} ($branch)"
+            SLACK_MESSAGE="Existe arquivo com caracteres especiais no push\ngithub.com/${GITHUB_REPOSITORY} ($branch)\nNúmero do commit ${{ github.sha }}"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
             
             exit 1
