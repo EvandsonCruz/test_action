@@ -43,6 +43,5 @@ jobs:
             # Enviar notificação para o Slack
             SLACK_MESSAGE="Existe nome de arquivo com caracteres especiais no push\ngithub.com/${GITHUB_REPOSITORY}/commit/${{ github.sha }} ($branch)"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-            
             exit 1
           fi
