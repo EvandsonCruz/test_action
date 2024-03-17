@@ -37,5 +37,10 @@ jobs:
           
           if [ "$encontrado" == true ]; then
             echo "Arquivo(s) com caracteres especiais encontrados. Commit bloqueado."
+            
+            # Enviar notificação para o Slack
+            SLACK_MESSAGE="Existe arquivo com caracteres especiais no push para a branch main"
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+            
             exit 1
           fi
