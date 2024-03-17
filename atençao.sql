@@ -28,3 +28,4 @@ JOIN
     AvgRunDuration ard ON j.job_name = ard.job_name
 WHERE
     j.actual_start_date = (SELECT MAX(actual_start_date) FROM Last3RunDurations WHERE job_name = j.job_name AND rn = 1);  
+ 
