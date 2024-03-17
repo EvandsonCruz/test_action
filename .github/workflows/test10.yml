@@ -20,6 +20,7 @@ jobs:
       - name: Obter lista de arquivos alterados
         run: |
           set -x
+          branch=$(echo "${{ github.ref }}" | awk -F'/' '{print $NF}')
           # Obter a lista de arquivos alterados no push
           arquivos_alterados=($(git diff --name-only HEAD^1))
 
@@ -40,7 +41,7 @@ jobs:
             
             # Enviar notificação para o Slack
             SLACK_MESSAGE="Existe arquivo com caracteres especiais no push 
-            github.com/${GITHUB_REPOSITORY} (${{ github.base_ref }})"
+            github.com/${GITHUB_REPOSITORY} (${{ branch }})"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
             
             exit 1
