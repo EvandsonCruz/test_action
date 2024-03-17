@@ -14,25 +14,31 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Obter informações do commit
+        id: commit_info
+        run: |
+          commit_sha=${{ github.sha }}
+          commit_info=$(curl -s "https://api.github.com/repos/${{ github.repository }}/commits/$commit_sha")
+          commit_number=$(echo "$commit_info" | jq -r '.number')
+          echo "::set-output name=commit_number::$commit_number"
+
       - name: Configurar variável de ambiente GH_TOKEN
         run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
       - name: Obter lista de arquivos alterados
         run: |
           set -x
+          # Obter a branch em que a action está rodando
           branch=$(echo "${{ github.ref }}" | awk -F'/' '{print $NF}')
-          #commit_number=$(${{ github.sha }})
+
           # Obter a lista de arquivos alterados no push
           arquivos_alterados=($(git diff --name-only HEAD^1))
 
-          # Adicionar ação para validar encoding
+          # Adicionar ação para validar caracteres especiais no nome do arquivo
           for arquivo in "${arquivos_alterados[@]}"; do
-            encoding_info=$(file -i "$arquivo" | awk -F "=" '{print $2}' | tr -d ' ')
-            
-            if [ "$encoding_info" != "us-ascii" ] && [ "$encoding_info" != "utf-8" ] && [ "$encoding_info" != "binary" ]; then
-              echo ">>>>>>>>>>>>>>>> $encoding_info"
-              echo "::error::Existe arquivo com caracteres especiais no push"
-              saida+="$arquivo"$'\n'
+            filename=$(basename "$arquivo")
+            if [[ "$filename" =~ [^a-zA-Z0-9_\.-] ]]; then
+              echo "::error::Nome de arquivo com caracteres especiais no push: $filename"
               encontrado=true
             fi
           done
@@ -41,7 +47,17 @@ jobs:
             echo "Arquivo(s) com caracteres especiais encontrados. Commit bloqueado."
             
             # Enviar notificação para o Slack
-            SLACK_MESSAGE="Existe nome de arquivo com caracteres especiais no push\ngithub.com/${GITHUB_REPOSITORY}/commit/${{ github.sha }} ($branch) <@evandson.cruz>"
+            SLACK_MESSAGE="Existe arquivo com caracteres especiais no push para a branch $branch"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+            
+            # Use o número do commit obtido anteriormente para adicionar ao comentário
+            PR_NUMBER=$(echo "${{ steps.commit_info.outputs.commit_number }}")
+            REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+            REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+            AUTHOR_NAME=${{ github.actor }}
+            gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+            Existe arquivo com caracteres especiais no push.
+            Por favor, corrija o(s) arquivo(s) e faça um novo commit."
+            
             exit 1
           fi
