@@ -27,6 +27,7 @@ jobs:
 
           # Adicionar ação para validar nome de arquivo com caracteres especiais
           for arquivo in "${arquivos_alterados[@]}"; do
+          arquivo=$(basename "$arquivo")
             if [[ "$arquivo" =~ [^a-zA-Z0-9_\.-] ]]; then
               echo "::error::Existe nome de arquivo com caracteres especiais no push: $arquivo"
               encontrado=true
