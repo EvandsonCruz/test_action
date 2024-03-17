@@ -39,7 +39,8 @@ jobs:
             echo "Arquivo(s) com caracteres especiais encontrados. Commit bloqueado."
             
             # Enviar notificação para o Slack
-            SLACK_MESSAGE="Existe arquivo com caracteres especiais no push para a branch main"
+            SLACK_MESSAGE="Existe arquivo com caracteres especiais no push 
+            github.com/${GITHUB_REPOSITORY} (${{ github.base_ref }})"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
             
             exit 1
