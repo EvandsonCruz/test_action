@@ -22,17 +22,17 @@ jobs:
           set -x
           branch=$(echo "${{ github.ref }}" | awk -F'/' '{print $NF}')
           #commit_number=$(${{ github.sha }})
-          # Obter a lista de arquivos alterados no push
-          arquivos_alterados=($(git diff --name-only HEAD^1))
-
+          # Obter a lista de arquivos alterados no push e armazená-los em uma string delimitada por \n
+          arquivos_alterados=$(git diff --name-only HEAD^1)
+          
           # Adicionar ação para validar nome de arquivo com caracteres especiais
-          for arquivo in "${arquivos_alterados[@]}"; do
+          while IFS= read -r arquivo; do
           arquivo=$(basename "$arquivo")
             if [[ "$arquivo" =~ [^a-zA-Z0-9_\.-] ]]; then
               echo "::error::Existe nome de arquivo com caracteres especiais no push: $arquivo"
               encontrado=true
             fi
-          done
+          done <<< "$arquivos_alterados"
           
           if [ "$encontrado" == true ]; then
             echo "Arquivo(s) com caracteres especiais encontrados. Commit bloqueado."
