@@ -28,7 +28,7 @@ jobs:
           # Adicionar ação para validar nome de arquivo com caracteres especiais
           while IFS= read -r arquivo; do
           #arquivo=$(basename "$arquivo")
-            if [[ "$arquivo" =~ [^a-zA-Z0-9_\.-] ]]; then
+            if [[ "$arquivo" =~ [^a-zA-Z0-9_\.-/] ]]; then
               echo "::error::Existe nome de arquivo com caracteres especiais no push: $arquivo"
               encontrado=true
             fi
