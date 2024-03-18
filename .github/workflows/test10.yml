@@ -35,7 +35,7 @@ jobs:
           done <<< "$arquivos_alterados"
           
           if [ "$encontrado" == true ]; then
-            echo "Arquivo(s) com caracteres especiais encontrados. Commit bloqueado."
+            echo "Arquivo(s) com caracteres especiais encontrado."
             
             # Enviar notificação para o Slack
             SLACK_MESSAGE="Existe nome de arquivo com caracteres especiais no push\nhttps://github.com/${GITHUB_REPOSITORY}/commit/${{ github.sha }} ($branch) <@evandson.cruz>"
