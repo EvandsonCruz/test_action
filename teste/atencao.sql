@@ -1,1 +1,1 @@
-create index ab.teste;
+
