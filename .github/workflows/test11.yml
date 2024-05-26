@@ -1,0 +1,82 @@
+name: Caracteres especiais
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validar-caracteres:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Configurar variável de ambiente GH_TOKEN
+        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Obter lista de arquivos alterados
+        run: |
+          encontrada=false
+          saida=""
+
+          echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+
+          # Obtém a lista de arquivos adicionados no pull request
+          arquivos_adicionados=($(git diff --name-only HEAD^1))
+          echo "Arquivos adicionados: ${arquivos_adicionados[@]}"
+
+          for arquivo in "${arquivos_adicionados[@]}"; do
+          echo "Verificando o arquivo: $arquivo"
+
+          if awk '/create index/ && !/tablespace/' "$arquivo" | grep -q "."; then
+            encontrada=true
+            saida="$saida$arquivo"$'\n'
+          else
+             echo "index OK"
+          fi
+          done
+
+          if [ "$encontrada" == true ]; then
+          echo "::error::Criação de índice sem tablespace"
+          SLACK_MESSAGE="Criação de índice sem tablespace no PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+          Criação de índice sem tablespace
+          ${saida}Por favor revisar."
+          exit 1
+          else
+          echo "PR OK"
+          fi
+
+          continue-on-error: false
+          
+          set -x
+          branch=$(echo "${{ github.ref }}" | awk -F'/' '{print $NF}')
+          #commit_number=$(${{ github.sha }})
+          # Obter a lista de arquivos alterados no push e armazená-los em uma string delimitada por \n
+          arquivos_alterados=$(git diff --name-only HEAD^1)
+          
+          # Adicionar ação para validar nome de arquivo com caracteres especiais
+          while IFS= read -r arquivo; do
+          #arquivo=$(basename "$arquivo")
+            if [[ "$arquivo" =~ [^a-zA-Z0-9_\.-/] ]]; then
+              echo "::error::Existe nome de arquivo com caracteres especiais no push: $arquivo"
+              encontrado=true
+            fi
+          done <<< "$arquivos_alterados"
+          
+          if [ "$encontrado" == true ]; then
+            echo "Arquivo(s) com caracteres especiais encontrado."
+            
+            # Enviar notificação para o Slack
+            SLACK_MESSAGE="Existe nome de arquivo com caracteres especiais no push\nhttps://github.com/${GITHUB_REPOSITORY}/commit/${{ github.sha }} ($branch) <@evandson.cruz>"
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+            exit 1
+          fi
