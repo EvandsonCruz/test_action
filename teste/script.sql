@@ -1,2 +1,1 @@
-create index ab.teste;
-/
+create index ab.teste;/
