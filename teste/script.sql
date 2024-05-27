@@ -1,1 +1,2 @@
 create index ab.teste;
+/
