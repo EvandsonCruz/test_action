@@ -37,11 +37,15 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Verificando o arquivo: $arquivo"
 
-          if grep -iq 'create (or replace) trigger' "$arquivo" && ! grep -q '^/$' "$arquivo"; then
-            encontrada=true
-            saida="$saida$arquivo"$'\n'
+          if awk 'BEGIN{IGNORECASE=1} \
+              /create trigger/ || /create or replace trigger/ {found=1} \
+              /END;/ {end_found=1} \
+              /^\/$/ {slash=1} \
+              END {exit !(found && end_found && slash)}' "$arquivo"; then
+              encontrada=true
+              saida="$saida$arquivo"$'\n'
           else
-             echo "index OK"
+              echo "index OK"
           fi
         done
 
