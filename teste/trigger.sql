@@ -1,1 +1,1 @@
-create trigger ab.abc;
+create trigger ab.abc;/
