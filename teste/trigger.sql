@@ -1,2 +1,2 @@
-CREATE TRIGGER ab.abc; 
+CREATE TRIGGER ab.abc;  
 /
