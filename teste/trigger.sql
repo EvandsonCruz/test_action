@@ -1,2 +1,1 @@
-CREATE OR REPLACE TRIGGER ab.abc;  
-/
+CREATE OR replace TRIGGER ab.abc;/
