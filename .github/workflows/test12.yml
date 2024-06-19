@@ -38,16 +38,10 @@ jobs:
           echo "Verificando o arquivo: $arquivo"
 
           if awk '
-          BEGIN {IGNORECASE=1; found=0; end_found=0; slash=0; invalid_slash=0; trigger_name=""}
+          BEGIN {IGNORECASE=1; found=0; end_found=0; slash=0; trigger_name=""}
           /create trigger/ || /create or replace trigger/ {found=1}
-          /END[ ]+[A-Za-z0-9_]+;/ {
-        end_found=1; 
-        trigger_name=$0; 
-        gsub(/.*END[ ]+/,"",trigger_name); 
-        gsub(/;.*$/,"",trigger_name);
-        next
-          }
-        {if (end_found && $0 ~ "^/$") slash=1}
+          /END[ ]+[A-Za-z0-9_]+;/ {end_found=1}
+          /^\/$/ {slash=1}
           END {exit !(found && end_found && slash)}' "$arquivo"; then
               encontrada=true
               saida="$saida$arquivo"$'\n'
