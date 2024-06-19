@@ -1,4 +1,4 @@
-CREATE OR REPLACE TRIGGER trg_update_last_updated  
+CREATE OR REPLACE TRIGGER trg_update_last_updated   
 BEFORE UPDATE ON employees
 FOR EACH ROW
 
