@@ -44,4 +44,5 @@ EXCEPTION
         -- Re-raise the exception
         RAISE;
 
-END trg_update_last_updated;/
+END trg_update_last_updated;
+/
