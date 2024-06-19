@@ -37,17 +37,21 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Verificando o arquivo: $arquivo"
 
-          if awk '
-          BEGIN {IGNORECASE=1; found=0; end_found=0; slash=0; trigger_name=""}
-          /create trigger/ || /create or replace trigger/ {found=1}
-          /END[ ]+[A-Za-z0-9_]+;/ {end_found=1}
-          /^\/$/ {slash=1}
-          END {exit !(found && end_found && slash)}' "$arquivo"; then
-              encontrada=true
-              saida="$saida$arquivo"$'\n'
-          else
-              echo "index OK"
-          fi
+          if grep -Ei -q 'create trigger|create or replace trigger' "$arquivo"; then
+        echo "Validando arquivo adicionado: $arquivo"
+        check=$(awk '
+            /END.*;$/ {flag=1; next}
+            /^\/$/ {if(flag){print "Encontrado ;/ no arquivo"}}
+            {flag=0}
+        ' "$arquivo")
+        if [[ -n "$check" ]]; then
+            echo "O arquivo $arquivo está no formato correto com ;/ no final."
+        else
+            echo "O arquivo $arquivo não tem ;/ no final, ou está mal formatado."
+            encontrada=true
+            saida+="$saida$arquivo"$'\n'
+        fi
+        fi
         done
 
         if [ "$encontrada" == true ]; then
