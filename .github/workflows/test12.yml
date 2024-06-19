@@ -37,12 +37,13 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Verificando o arquivo: $arquivo"
 
-          if awk 'BEGIN{IGNORECASE=1} \
-              /create trigger/ || /create or replace trigger/ {found=1} \
-              /END;/ {end_found=1; next} \
-              /^\/$/ {slash=1} \
-              {if (/\/$/ && !/END;/) invalid_slash=1} \
-              END {exit !(found && end_found && slash && !invalid_slash)}' "$arquivo"; then
+          if awk '
+          BEGIN {IGNORECASE=1; found=0; end_found=0; slash=0; invalid_slash=0}
+          /create trigger/ || /create or replace trigger/ {found=1}
+          /END;/ {end_found=1}
+          /^\/$/ {if (end_found) slash=1; else invalid_slash=1}
+          {if (/\/$/ && !/END;/) invalid_slash=1}
+          END {exit !(found && end_found && slash && !invalid_slash)}' "$arquivo"; then
               encontrada=true
               saida="$saida$arquivo"$'\n'
           else
