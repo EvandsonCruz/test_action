@@ -1,1 +1,1 @@
-create trigger ab.teste;
+create index ab.teste;
