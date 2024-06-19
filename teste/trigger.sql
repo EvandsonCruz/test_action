@@ -1,4 +1,4 @@
-create or replace trigger ab.trg_update_last_updated      
+create or replace trigger ab.trg_update_last_updated       
 BEFORE UPDATE ON employees
 FOR EACH ROW
 
