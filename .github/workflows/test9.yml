@@ -63,6 +63,10 @@ jobs:
   validar-barra:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
