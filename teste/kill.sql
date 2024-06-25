@@ -14,11 +14,12 @@ LOCK_ID2               NUMBER
 
 create or replace NONEDITIONABLE PROCEDURE check_locks AS
     num_locks NUMBER;
+    session_type VARCHAR2(20);
 BEGIN
     -- Verifica o número de locks
     SELECT COUNT(*)
     INTO num_locks
-    FROM v$lock
+    FROM gv$lock
     WHERE request > 0; -- Locks solicitados (bloqueados)
 
     -- Se houver locks, registrar na tabela de log
@@ -34,12 +35,13 @@ BEGIN
                 s1.osuser AS blocking_osuser,
                 s2.username AS blocked_user,
                 s1.serial# AS blocking_serial#,
+                s1.inst_id,
                 s1.sql_id AS blocking_sql_id
             FROM
-                v$lock l1
-                JOIN v$session s1 ON l1.sid = s1.sid
-                JOIN v$lock l2 ON l1.id1 = l2.id1 AND l1.id2 = l2.id2
-                JOIN v$session s2 ON l2.sid = s2.sid
+                gv$lock l1
+                JOIN gv$session s1 ON l1.sid = s1.sid
+                JOIN gv$lock l2 ON l1.id1 = l2.id1 AND l1.id2 = l2.id2
+                JOIN gv$session s2 ON l2.sid = s2.sid
             WHERE
                 l1.block = 1 AND l2.request > 0
         ) LOOP
@@ -63,19 +65,24 @@ BEGIN
                 rec.blocking_user,
                 rec.blocking_osuser,
                 rec.blocking_sql_id,
-                SYS_CONTEXT('USERENV', 'INSTANCE'),
+                rec.inst_id,
                 rec.lock_type,
                 rec.lock_id1,
                 rec.lock_id2
             );
+            
+            SELECT type
+            INTO session_type
+            FROM gv$session
+            WHERE sid = rec.blocking_session AND inst_id = rec.inst_id;
 
             -- Kill the blocking session if it's a user session and not a background session
-            IF rec.blocking_user IS NOT NULL THEN
+            IF rec.blocking_user IS NOT NULL AND session_type = 'USER' THEN
                 BEGIN
-                    EXECUTE IMMEDIATE 'ALTER SYSTEM KILL SESSION ''' || rec.blocking_session || ',' || rec.blocking_serial# || ',@' || SYS_CONTEXT('USERENV', 'INSTANCE') || ''' IMMEDIATE';
+                    EXECUTE IMMEDIATE 'ALTER SYSTEM KILL SESSION ''' || rec.blocking_session || ',' || rec.blocking_serial# || ',@' || rec.inst_id || ''' IMMEDIATE';
                 EXCEPTION
                     WHEN OTHERS THEN
-                        DBMS_OUTPUT.PUT_LINE('Error killing session: ' || rec.blocking_session || ',' || rec.blocking_serial# || ',@' || SYS_CONTEXT('USERENV', 'INSTANCE') || ' - ' || SQLERRM);
+                        DBMS_OUTPUT.PUT_LINE('Error killing session: ' || rec.blocking_session || ',' || rec.blocking_serial# || ',@' || rec.inst_id || ' - ' || SQLERRM);
                 END;
             END IF;
         END LOOP;
