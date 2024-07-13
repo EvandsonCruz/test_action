@@ -46,7 +46,7 @@ jobs:
             done
             if [ ${#colunas_faltando[@]} -ne 0 ]; then
               colunas_faltando_str=$(IFS=, ; echo "${colunas_faltando[*]}")
-              mensagem_erro+="Arquivo: $arquivo, Colunas faltando: $colunas_faltando_str\n"
+              mensagem_erro+="Arquivo: $arquivo, Colunas faltando: $colunas_faltando_str\n\n"
             else
               echo "A criação da tabela no arquivo $arquivo tem todas as colunas de auditoria necessárias"
             fi
