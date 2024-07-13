@@ -51,7 +51,7 @@ jobs:
         if [ "$problemas" = true ]; then
           mensagem_erro=$(echo -e "$mensagem_erro" | sed 's/\n$//')
 
-          echo "::error::A criação da tabela no arquivo $arquivo_com_erro não tem todos os campos de auditoria necessários: $colunas_faltando_str"
+          echo "::error::A criação de tabela não tem todos os campos de auditoria necessários: \n$mensagem_erro"
 
           SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n\nA criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro"
 
