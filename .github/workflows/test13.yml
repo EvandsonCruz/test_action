@@ -1,4 +1,4 @@
-name: Validar Commits nos Arquivos SQL
+name: Validar colunas auditoria
 on:
   pull_request:
     types:
@@ -8,7 +8,7 @@ on:
       - edited
 
 jobs:
-  validar-commits:
+  validar-auditoria:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +26,7 @@ jobs:
         naotem=false
         arquivo_com_erro=""
 
-        # Definir lista de colunas necessárias
+        # Definir lista de colunas
         colunas=("DT_ATLZ" "DT_CRIACAO" "USER_CRIACAO" "USER_ATLZ")
         
         # Obter a lista de arquivos alterados no pull request
