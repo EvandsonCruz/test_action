@@ -1,0 +1,60 @@
+name: Validar Commits nos Arquivos SQL
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+jobs:
+  validar-commits:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Configurar variável de ambiente GH_TOKEN
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
+
+    - name: Obter lista de arquivos alterados
+      run: |
+        # Obter a lista de arquivos alterados no pull request
+        arquivos_alterados=($(git diff --name-only HEAD^1))
+
+          # Obter a lista de arquivos no pull request
+          arquivos=($(git diff --name-only HEAD^1))
+          
+          for arquivo in "${arquivos[@]}"; do
+            # Verificar se o arquivo contém uma declaração CREATE TABLE
+            if grep -qiE 'CREATE TABLE' "$arquivo"; then
+                #validar campos
+                if DT_ATLZ not exists
+                $naotem = true
+                echo "A criação da tabela não tem os campos de auditoria"
+                break
+                else
+                echo "A criação da tabela tem os campos de auditoria"
+                fi
+              fi
+            fi
+          done
+        fi
+
+        if [ "$naotem" == true ]; then
+          echo "::error::A criação da tabela não tem os campos de auditoria"
+          SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\nA criação da tabela não tem os campos de auditoria"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+          A criação da tabela não tem os campos de auditoria."
+          #gh pr close ${{ github.event.number }}
+        else
+          echo "PR OK"
+        fi
