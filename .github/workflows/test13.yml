@@ -22,52 +22,42 @@ jobs:
 
     - name: Obter lista de arquivos alterados e validar commits
       run: |
-        # Inicializar variável
         problemas=false
         mensagem_erro=""
-        
-        # Definir lista de colunas necessárias
+
         colunas=("DT_ATLZ" "DT_CRIACAO" "USUARIO_CRIACAO" "USUARIO_ATUALIZACAO")
-        
-        # Obter a lista de arquivos alterados no pull request
+
         arquivos_alterados=$(git diff --name-only HEAD^1)
 
         for arquivo in $arquivos_alterados; do
-          # Verificar se o arquivo contém uma declaração CREATE TABLE
           if grep -qiE 'CREATE TABLE' "$arquivo"; then
             colunas_faltando=()
-            # Verificar se todas as colunas necessárias existem
             for coluna in "${colunas[@]}"; do
               if ! grep -qiE "$coluna" "$arquivo"; then
                 problemas=true
                 colunas_faltando+=("$coluna")
-                echo "A criação da tabela no arquivo $arquivo não tem a coluna de auditoria: $coluna"
               fi
             done
             if [ ${#colunas_faltando[@]} -ne 0 ]; then
               colunas_faltando_str=$(IFS=, ; echo "${colunas_faltando[*]}")
               mensagem_erro+="Arquivo: $arquivo, Colunas faltando: $colunas_faltando_str\n"
-            else
-              echo "A criação da tabela no arquivo $arquivo tem todas as colunas de auditoria necessárias"
             fi
           fi
         done
 
         if [ "$problemas" = true ]; then
-          echo "::error::A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro"
+          mensagem_erro=$(echo -e "$mensagem_erro" | sed 's/\n$//') # Remove a última quebra de linha
           SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n\nA criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro"
+          
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
-          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-
-          A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:
-
-          $mensagem_erro"
-          # Remover a última quebra de linha se existir
-          mensagem_erro=$(echo -e "${mensagem_erro}" | sed '$ s/\n$//')
-        else
+          
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME\n\nA criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro"
+          exit 1
+          else
           echo "PR OK"
         fi
