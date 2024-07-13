@@ -45,7 +45,10 @@ jobs:
         done
 
         if [ "$problemas" = true ]; then
-          SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n\nA criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$message_erro"
+          # Remover a última quebra de linha
+          mensagem_erro=$(echo -e "$mensagem_erro" | sed 's/\n$//')
+
+          SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n\nA criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro"
 
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           
