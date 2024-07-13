@@ -1,4 +1,4 @@
-name: Validar colunas auditoria
+name: Validar Commits nos Arquivos SQL
 on:
   pull_request:
     types:
@@ -8,7 +8,7 @@ on:
       - edited
 
 jobs:
-  validar-colunas:
+  validar-commits:
     runs-on: ubuntu-latest
 
     steps:
@@ -60,7 +60,8 @@ jobs:
 
           A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:
 
-          $mensagem_erro"
-          else
+        $mensagem_erro"
+        exit 1
+        else
           echo "PR OK"
-          fi
+        fi
