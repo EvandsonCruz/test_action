@@ -46,7 +46,7 @@ jobs:
             done
             if [ ${#colunas_faltando[@]} -ne 0 ]; then
               colunas_faltando_str=$(IFS=, ; echo "${colunas_faltando[*]}")
-              mensagem_erro+="Arquivo: $arquivo, Colunas faltando: $colunas_faltando_str\n\n"
+              mensagem_erro+="Arquivo: $arquivo, Colunas faltando: $colunas_faltando_str\n"
             else
               echo "A criação da tabela no arquivo $arquivo tem todas as colunas de auditoria necessárias"
             fi
@@ -66,7 +66,8 @@ jobs:
           A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:
 
           $mensagem_erro"
-          #gh pr close ${{ github.event.number }}
-          else
+          # Remover a última quebra de linha se existir
+          mensagem_erro=$(echo -e "${mensagem_erro}" | sed '$ s/\n$//')
+        else
           echo "PR OK"
-          fi
+        fi
