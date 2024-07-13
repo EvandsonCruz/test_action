@@ -1,4 +1,4 @@
-name: Validar Commits nos Arquivos SQL
+name: Validar colunas auditoria
 on:
   pull_request:
     types:
@@ -8,7 +8,7 @@ on:
       - edited
 
 jobs:
-  validar-commits:
+  validar-colunas:
     runs-on: ubuntu-latest
 
     steps:
