@@ -38,7 +38,11 @@ jobs:
               fi
             done
             if [ ${#colunas_faltando[@]} -ne 0 ]; then
-              colunas_faltando_str=$(IFS=', ' ; echo "${colunas_faltando[*]}")
+              colunas_faltando_str=""
+              for coluna in "${colunas_faltando[@]}"; do
+                colunas_faltando_str+="$coluna, "
+              done
+              colunas_faltando_str=${colunas_faltando_str%, } # Remove a última vírgula e espaço
               mensagem_erro+="Arquivo: $arquivo, Colunas faltando: $colunas_faltando_str\n"
             fi
           fi
