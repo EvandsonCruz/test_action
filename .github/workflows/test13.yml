@@ -27,7 +27,7 @@ jobs:
         mensagem_erro=""
         
         # Definir lista de colunas necessárias
-        colunas=("DT_ATLZ" "DT_CRIACAO" "USUARIO_CRIACAO" "USUARIO_ATUALIZACAO")
+        colunas=("DT_ATLZ" "DT_CRIACAO" "USER_CRIACAO" "USER_ATLZ")
         
         # Obter a lista de arquivos alterados no pull request
         arquivos_alterados=$(git diff --name-only HEAD^1)
