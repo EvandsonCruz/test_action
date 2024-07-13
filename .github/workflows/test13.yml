@@ -36,7 +36,6 @@ jobs:
               naotem=true
               echo "A criação da tabela não tem os campos de auditoria"
               break
-              exit 1
             else
               echo "A criação da tabela tem os campos de auditoria"
             fi
@@ -54,6 +53,7 @@ jobs:
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
           A criação da tabela não tem os campos de auditoria."
           #gh pr close ${{ github.event.number }}
+          exit 1
         else
           echo "PR OK"
         fi
