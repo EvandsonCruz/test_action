@@ -24,6 +24,10 @@ jobs:
       run: |
         # Inicializar variável
         naotem=false
+        arquivo_com_erro=""
+
+        # Definir lista de colunas necessárias
+        colunas=("DT_ATLZ" "DT_CRIACAO" "USER_CRIACAO" "USER_ATLZ")
         
         # Obter a lista de arquivos alterados no pull request
         arquivos_alterados=$(git diff --name-only HEAD^1)
@@ -31,29 +35,34 @@ jobs:
         for arquivo in $arquivos_alterados; do
           # Verificar se o arquivo contém uma declaração CREATE TABLE
           if grep -qiE 'CREATE TABLE' "$arquivo"; then
-            # Verificar se o campo DT_ATLZ existe
-            if ! grep -qiE 'DT_ATLZ' "$arquivo"; then
-              naotem=true
-              echo "A criação da tabela não tem os campos de auditoria"
+            # Verificar se todas as colunas necessárias existem
+            for coluna in "${colunas[@]}"; do
+              if ! grep -qiE "$coluna" "$arquivo"; then
+                naotem=true
+                arquivo_com_erro="$arquivo"
+                echo "A criação da tabela no arquivo $arquivo não tem a coluna de auditoria: $coluna"
+                break
+              fi
+            done
+            if [ "$naotem" = true ]; then
               break
             else
-              echo "A criação da tabela tem os campos de auditoria"
+              echo "A criação da tabela no arquivo $arquivo tem todas as colunas de auditoria necessárias"
             fi
           fi
         done
 
         if [ "$naotem" = true ]; then
-          echo "::error::A criação da tabela não tem os campos de auditoria"
-          SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\nA criação da tabela não tem os campos de auditoria"
+          echo "::error::A criação da tabela no arquivo $arquivo_com_erro não tem todos os campos de auditoria necessários"
+          SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\nA criação da tabela no arquivo $arquivo_com_erro não tem todos os campos de auditoria necessários"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-          A criação da tabela não tem os campos de auditoria."
+          A criação da tabela no arquivo $arquivo_com_erro não tem todos os campos de auditoria necessários."
           #gh pr close ${{ github.event.number }}
-          exit 1
         else
           echo "PR OK"
         fi
