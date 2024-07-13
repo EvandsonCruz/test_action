@@ -1,4 +1,4 @@
-name: Validar Commits nos Arquivos SQL
+name: Validar colunas auditoria
 on:
   pull_request:
     types:
@@ -8,7 +8,7 @@ on:
       - edited
 
 jobs:
-  validar-commits:
+  validar-colunas:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,7 @@ jobs:
         mensagem_erro=""
         
         # Definir lista de colunas necessárias
-        colunas=("DT_ATLZ" "DT_CRIACAO" "USER_CRIACAO" "USER_ATLZ")
+        colunas=("DT_ATLZ" "DT_CRIACAO" "USUARIO_CRIACAO" "USUARIO_ATUALIZACAO")
         
         # Obter a lista de arquivos alterados no pull request
         arquivos_alterados=$(git diff --name-only HEAD^1)
@@ -55,14 +55,17 @@ jobs:
 
         if [ "$problemas" = true ]; then
           echo "::error::A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro"
-          SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\nA criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro"
+          SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})
+          A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:
+          $mensagem_erro"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-          A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro."
+          A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:
+          $mensagem_erro"
           #gh pr close ${{ github.event.number }}
           exit 1
         else
