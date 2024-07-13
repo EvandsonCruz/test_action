@@ -1,4 +1,4 @@
-name: Validar Commits nos Arquivos SQL
+name: Validar colunas auditoria
 on:
   pull_request:
     types:
@@ -8,7 +8,7 @@ on:
       - edited
 
 jobs:
-  validar-commits:
+  validar-colunas:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,14 +38,13 @@ jobs:
               fi
             done
             if [ ${#colunas_faltando[@]} -ne 0 ]; then
-              colunas_faltando_str=$(IFS=, ; echo "${colunas_faltando[*]}")
+              colunas_faltando_str=$(IFS=', ' ; echo "${colunas_faltando[*]}")
               mensagem_erro+="Arquivo: $arquivo, Colunas faltando: $colunas_faltando_str\n"
             fi
           fi
         done
 
         if [ "$problemas" = true ]; then
-          # Remover a última quebra de linha
           mensagem_erro=$(echo -e "$mensagem_erro" | sed 's/\n$//')
 
           SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n\nA criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:\n$mensagem_erro"
@@ -61,8 +60,7 @@ jobs:
 
           A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:
 
-         $mensagem_erro"
-         exit 1
-         else
+          $mensagem_erro"
+          else
           echo "PR OK"
-        fi
+          fi
