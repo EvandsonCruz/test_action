@@ -36,6 +36,7 @@ jobs:
               naotem=true
               echo "A criação da tabela não tem os campos de auditoria"
               break
+              exit 1
             else
               echo "A criação da tabela tem os campos de auditoria"
             fi
