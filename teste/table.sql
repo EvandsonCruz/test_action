@@ -1,1 +1,1 @@
-create table ab.abc (id number);   
+create table ab.abc (id number, dt_atlz varchar2(30));   
