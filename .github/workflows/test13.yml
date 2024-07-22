@@ -9,7 +9,7 @@ on:
 
 jobs:
   checkout:
-    runs-on: deploy
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v2
