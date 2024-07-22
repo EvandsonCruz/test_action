@@ -9,43 +9,29 @@ on:
 
 jobs:
   checkout:
-    runs-on: ubuntu-latest
+    runs-on: deploy
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
-      - name: Cache do repositório
-        uses: actions/cache@v2
-        with:
-          path: |
-            .
-          key: ${{ runner.os }}-repo-${{ github.sha }}
+          fetch-depth: 1
   validar-colunas:
     runs-on: ubuntu-latest
     needs: checkout
     steps:
-      - name: Restaurar cache do repositório
-        uses: actions/cache@v2
-        with:
-          path: |
-            .
-          key: ${{ runner.os }}-repo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-repo-  
-      
-      - name: Configurar variável de ambiente GH_TOKEN
-        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
-      
-      - name: Obter lista de arquivos alterados
-        run: |
-         problemas=false
-         mensagem_erro=""
+    
+    - name: Configurar variável de ambiente GH_TOKEN
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
-         colunas=("DT_ATLZ" "DT_CRIACAO" "USUARIO_CRIACAO" "USUARIO_ATUALIZACAO")
-         arquivos_alterados=$(git diff --name-only HEAD^1)
+    - name: Obter lista de arquivos alterados
+      run: |
+        problemas=false
+        mensagem_erro=""
 
-         for arquivo in $arquivos_alterados; do
+        colunas=("DT_ATLZ" "DT_CRIACAO" "USUARIO_CRIACAO" "USUARIO_ATUALIZACAO")
+        arquivos_alterados=$(git diff --name-only HEAD^1)
+
+        for arquivo in $arquivos_alterados; do
           if grep -qiE 'CREATE TABLE' "$arquivo"; then
             colunas_faltando=()
             for coluna in "${colunas[@]}"; do
@@ -63,9 +49,9 @@ jobs:
               mensagem_erro+="Arquivo: $arquivo, Colunas faltando: $colunas_faltando_str\n"
             fi
           fi
-         done
+        done
 
-         if [ "$problemas" = true ]; then
+        if [ "$problemas" = true ]; then
           mensagem_erro=$(echo -e "$mensagem_erro" | sed 's/\n$//')
 
           echo "::error::A criação de tabela não tem todos os campos de auditoria necessários: $mensagem_erro"
@@ -83,24 +69,17 @@ jobs:
 
           A criação da tabela nos seguintes arquivos não tem todos os campos de auditoria necessários:
 
-         $mensagem_erro"
-         exit 1
-         else
+        $mensagem_erro"
+        exit 1
+        else
           echo "PR OK"
-         fi
+        fi
 
   validar-conteudo:
     runs-on: ubuntu-latest
     needs: checkout 
     steps:
-      - name: Restaurar cache do repositório
-        uses: actions/cache@v2
-        with:
-          path: |
-            .
-          key: ${{ runner.os }}-repo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-repo-
+      
       - name: Configurar variável de ambiente GH_TOKEN
         run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
@@ -176,14 +155,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: checkout
     steps:
-    - name: Restaurar cache do repositório
-      uses: actions/cache@v2
-      with:
-          path: |
-            .
-          key: ${{ runner.os }}-repo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-repo-
+    
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
