@@ -8,15 +8,18 @@ on:
       - edited
 
 jobs:
+  checkout:
+    runs-on: deploy
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
   validar-colunas:
     runs-on: ubuntu-latest
-
+    needs: checkout
     steps:
-    - name: Checkout do repositório
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-
+    
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
@@ -74,13 +77,9 @@ jobs:
 
   validar-conteudo:
     runs-on: ubuntu-latest
-
+    needs: checkout 
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
+      
       - name: Configurar variável de ambiente GH_TOKEN
         run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
@@ -154,13 +153,9 @@ jobs:
 
   validar-extensao:
     runs-on: ubuntu-latest
-
+    needs: checkout
     steps:
-    - name: Checkout do repositório
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-
+    
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
