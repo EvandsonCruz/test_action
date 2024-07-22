@@ -26,7 +26,10 @@ jobs:
         mensagem_erro=""
 
         colunas=("DT_ATLZ" "DT_CRIACAO" "USUARIO_CRIACAO" "USUARIO_ATUALIZACAO")
-        arquivos_alterados=$(git diff --name-only HEAD^1)
+        
+        # Verifica se o commit pai existe, se não usa HEAD
+        base_ref=$(git rev-parse --abbrev-ref HEAD^1 2>/dev/null || echo "HEAD")
+        arquivos_alterados=$(git diff --name-only $base_ref)
 
         for arquivo in $arquivos_alterados; do
           if grep -qiE 'CREATE TABLE' "$arquivo"; then
@@ -106,7 +109,7 @@ jobs:
             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
             # Obtém a lista de arquivos adicionados no pull request
-            arquivos_adicionados=($(git diff --name-only HEAD^1))
+            arquivos_adicionados=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }}))
             echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
 
             for arquivo in "${arquivos_adicionados[@]}"; do
@@ -168,7 +171,9 @@ jobs:
       id: listar-arquivos
       run: |
         
-          git diff --name-only HEAD^1 > files.txt
+          # Verifica se o commit pai existe, se não usa HEAD
+          base_ref=$(git rev-parse --abbrev-ref HEAD^1 2>/dev/null || echo "HEAD")
+          git diff --name-only $base_ref > files.txt
           cat files.txt
 
     - name: Verificar extensão de arquivos
@@ -188,7 +193,6 @@ jobs:
 
         if [ "$tem_erro" = true ]; then
           echo "Enviando notificação para o Slack..."
-          #curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"ERRO: Um ou mais arquivos no pull request não tem extensão. Todos os arquivos devem ter extensão.\n${saida}\"}" ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_MESSAGE="ERRO: Todos os arquivos devem ter extensão. PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\nUm ou mais arquivos no pull request não tem extensão:\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
