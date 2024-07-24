@@ -63,9 +63,9 @@ jobs:
                 for palavra_chave in "${palavras_chave[@]}"; do
                   for outra_palavra in "${outras_palavras[@]}"; do
                     # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
-                    if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; então
+                    if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; then
                       key="$arquivo|$palavra_chave|$outra_palavra"
-                      if [[ -z "${encontrados[$key]}" ]]; então
+                      if [[ -z "${encontrados[$key]}" ]]; then
                         echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
                         encontrados[$key]=true
                         encontrada=true
@@ -82,9 +82,9 @@ jobs:
                 for palavra_chave in "${palavras_chave[@]}"; do
                   for outra_palavra in "${outras_palavras[@]}"; do
                     # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
-                    if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; então
+                    if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; then
                       key="$arquivo|$palavra_chave|$outra_palavra"
-                      if [[ -z "${encontrados[$key]}" ]]; então
+                      if [[ -z "${encontrados[$key]}" ]]; then
                         echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
                         encontrados[$key]=true
                         encontrada=true
@@ -99,14 +99,14 @@ jobs:
           
           echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
     
-          if [ "$encontrada" == true ]; então
+          if [ "$encontrada" == true ]; then
             echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
             gh pr edit ${{ github.event.number }} --add-label bug
           fi
     
           echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
     
-          if [ "$encontrada" == true ]; então
+          if [ "$encontrada" == true ]; then
             SLACK_MESSAGE="Label 'Bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
             PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
