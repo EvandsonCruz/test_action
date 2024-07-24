@@ -42,6 +42,7 @@ jobs:
       
          encontrada=false 
          saida=""
+         declare -A encontrados
       
                   echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
          echo "#############################################################  ${{ github.event_name }}"
@@ -59,34 +60,42 @@ jobs:
              
              # Ler o arquivo linha por linha
              while IFS= read -r line; do
-               for palavra_chave in "${palavras_chave[@]}"; do
-                 for outra_palavra in "${outras_palavras[@]}"; do
-                   # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
-                   if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; then
-                     echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
-                     encontrada=true
-                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                   fi
-                 done
-               done
-             done < "$arquivo"
-           done
-         else 
-           for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-             while IFS= read -r line; do
-               for palavra_chave in "${palavras_chave[@]}"; do
-                 for outra_palavra in "${outras_palavras[@]}"; do
-                   # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
-                   if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; then
-                     echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
-                     encontrada=true
-                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                   fi
-                 done
-               done
-             done < "$arquivo"
-           done
-         fi
+                for palavra_chave in "${palavras_chave[@]}"; do
+                  for outra_palavra in "${outras_palavras[@]}"; do
+                    # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
+                    if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; then
+                      key="$palavra_chave|$outra_palavra|$arquivo"
+                      if [[ -z "${encontrados[$key]}" ]]; then
+                        echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
+                        encontrados[$key]=true
+                        encontrada=true
+                        saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                      fi
+                    fi
+                  done
+                done
+              done < "$arquivo"
+            done
+          else 
+            for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+              while IFS= read -r line; do
+                for palavra_chave in "${palavras_chave[@]}"; do
+                  for outra_palavra in "${outras_palavras[@]}"; do
+                    # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
+                    if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; então
+                      key="$palavra_chave|$outra_palavra|$arquivo"
+                      if [[ -z "${encontrados[$key]}" ]]; então
+                        echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
+                        encontrados[$key]=true
+                        encontrada=true
+                        saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                      fi
+                    fi
+                  done
+                done
+              done < "$arquivo"
+            done
+          fi
          
          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
      
