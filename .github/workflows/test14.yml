@@ -33,6 +33,7 @@ jobs:
 
       - name: Verificar Conteúdo do PR
         run: |
+         echo "GH_TOKEN=${{ secrets.GH_TOKEN }}"
          palavras_chave=("ALTER TABLE" "DROP PACKAGE")  # Substitua pela lista de palavras-chave desejada
          outras_palavras=("AB.ABC" "AB.CAB")  # Substitua pela segunda lista de palavras 
       
@@ -108,5 +109,3 @@ jobs:
            "
            exit 0
          fi
-         env:
-         GH_TOKEN: ${{ github.token }}
