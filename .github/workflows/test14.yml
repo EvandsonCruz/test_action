@@ -23,10 +23,8 @@ jobs:
           fetch-depth: 0
 
       - name: Configurar variável de ambiente GH_TOKEN
-        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
-
-      - name: Setup GitHub CLI
-        uses: actions/setup-gh-cli@v2
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Imprimir alterações
         run: |
