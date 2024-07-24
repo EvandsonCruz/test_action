@@ -23,7 +23,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup GitHub CLI
-        uses: actions/setup-gh-cli@v1
+        uses: sersoft-gmbh/setup-gh-cli-action@v2
+        with:
+         version: stable
 
       - name: Imprimir alterações
         run: |
