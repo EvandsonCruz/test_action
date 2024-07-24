@@ -38,7 +38,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
          palavras_chave=("ALTER TABLE" "DROP PACKAGE")  # Substitua pela lista de palavras-chave desejada
-         outras_palavras=("AB.ABC" "AB.CAB")  # Substitua pela segunda lista de palavras 
+         outras_palavras=("AB.ABC" "AB.ABC_2")  # Substitua pela segunda lista de palavras 
       
          encontrada=false 
          saida=""
