@@ -109,4 +109,4 @@ jobs:
            exit 0
          fi
          env:
-         GH_TOKEN: ${{ secrets.GH_TOKEN }}  
+         GH_TOKEN: ${{ github.token }}
