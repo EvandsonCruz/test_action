@@ -1,2 +1,2 @@
-create table ab.abc (id number)
+drop package ab.abc
 /       
