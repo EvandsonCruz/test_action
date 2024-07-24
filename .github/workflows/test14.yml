@@ -96,7 +96,6 @@ jobs:
           if [ "$encontrada" == true ]; then
             SLACK_MESSAGE="Label 'Bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-            exit 0
             PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
             REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
             REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
@@ -107,4 +106,5 @@ jobs:
             Deploy crítico.
             Horário sugerido de implementação após as 23:00
             "
+            exit 0
           fi
