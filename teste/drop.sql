@@ -1,4 +1,4 @@
-drop package ab.aa
+drop package ab.abc
 /  
 grant execute on ab.abc to user
 /  
