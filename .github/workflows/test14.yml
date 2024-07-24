@@ -87,14 +87,14 @@ jobs:
           echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
 
           if [ "$encontrada" == true ]; then
-            echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'Crítico'..."
-            gh pr edit ${{ github.event.number }} --add-label Crítico
+            echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
+            gh pr edit ${{ github.event.number }} --add-label bug
           fi
 
           echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
 
           if [ "$encontrada" == true ]; then
-            SLACK_MESSAGE="Label 'Crítico' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+            SLACK_MESSAGE="Label 'Bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_HML_DATABASE }}
             exit 0
           fi
