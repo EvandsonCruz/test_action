@@ -82,9 +82,9 @@ jobs:
                 for palavra_chave in "${palavras_chave[@]}"; do
                   for outra_palavra in "${outras_palavras[@]}"; do
                     # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
-                    if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; então
+                    if echo "$line" | grep -q -i "$palavra_chave" && echo "$line" | grep -q -i "$outra_palavra"; then
                       key="$palavra_chave|$outra_palavra|$arquivo"
-                      if [[ -z "${encontrados[$key]}" ]]; então
+                      if [[ -z "${encontrados[$key]}" ]]; then
                         echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
                         encontrados[$key]=true
                         encontrada=true
