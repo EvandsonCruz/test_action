@@ -114,6 +114,8 @@ jobs:
             REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
             AUTHOR_NAME=${{ github.event.pull_request.user.login }}
         
-            gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME\n\nDeploy crítico.\nHorário sugerido de implementação após as 23:00"
+            gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+            Deploy crítico.
+            Horário sugerido de implementação após as 23:00"
             exit 0
           fi
