@@ -45,58 +45,70 @@ jobs:
          
          if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened"  ]]; then
            echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
-       
+      
            # Obtém a lista de arquivos adicionados no pull request
            arquivos_adicionados=($(git diff --name-only HEAD^1))
            echo "##########################arquivos_adicionados###################################  ${arquivos_adicionados[*]}"
-       
+      
            for arquivo in "${arquivos_adicionados[@]}"; do
              echo "Novo arquivo adicionado: $arquivo"
              
-             # Verificar palavras-chave e outras_palavras em sequência
-             for ((i=0; i<${#palavras_chave[@]}; i++)); do
-               palavra_chave=${palavras_chave[i]}
-               outra_palavra=${outras_palavras[i]}
-               
-               if grep -q -i "$palavra_chave" "$arquivo"; then
-                 echo "Encontrada a palavra-chave '$palavra_chave' no arquivo: $arquivo"
+             # Ler o arquivo linha por linha
+             while IFS= read -r line; do
+               for ((i=0; i<${#palavras_chave[@]}; i++)); do
+                 palavra_chave=${palavras_chave[i]}
+                 outra_palavra=${outras_palavras[i]}
                  
-                 if grep -q -i "$outra_palavra" "$arquivo"; then
-                   echo "Encontrada a outra palavra '$outra_palavra' no arquivo: $arquivo"
-                   encontrada=true
-                   saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                 # Verificar se a linha contém a palavra-chave
+                 if echo "$line" | grep -q -i "$palavra_chave"; then
+                   echo "Encontrada a palavra-chave '$palavra_chave' no arquivo: $arquivo"
+      
+                   # Verificar se há uma linha subsequente que contém a outra palavra
+                   while IFS= read -r next_line; do
+                     if echo "$next_line" | grep -q -i "$outra_palavra"; then
+                       echo "Encontrada a outra palavra '$outra_palavra' após '$palavra_chave' no arquivo: $arquivo"
+                       encontrada=true
+                       saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                       break
+                     fi
+                   done < <(tail -n +$(($(grep -n -i "$palavra_chave" "$arquivo" | cut -d: -f1) + 1)) "$arquivo")
                  fi
-               fi
-             done
+               done
+             done < "$arquivo"
            done
          else 
            for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
-             for ((i=0; i<${#palavras_chave[@]}; i++)); do
-               palavra_chave=${palavras_chave[i]}
-               outra_palavra=${outras_palavras[i]}
-               
-               if grep -q -i "$palavra_chave" "$arquivo"; then
-                 echo "Encontrada a palavra-chave '$palavra_chave' no arquivo: $arquivo"
+             while IFS= read -r line; do
+               for ((i=0; i<${#palavras_chave[@]}; i++)); do
+                 palavra_chave=${palavras_chave[i]}
+                 outra_palavra=${outras_palavras[i]}
                  
-                 if grep -q -i "$outra_palavra" "$arquivo"; then
-                   echo "Encontrada a outra palavra '$outra_palavra' no arquivo: $arquivo"
-                   encontrada=true
-                   saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                 if echo "$line" | grep -q -i "$palavra_chave"; then
+                   echo "Encontrada a palavra-chave '$palavra_chave' no arquivo: $arquivo"
+                   
+                   while IFS= read -r next_line; do
+                     if echo "$next_line" | grep -q -i "$outra_palavra"; then
+                       echo "Encontrada a outra palavra '$outra_palavra' após '$palavra_chave' no arquivo: $arquivo"
+                       encontrada=true
+                       saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                       break
+                     fi
+                   done < <(tail -n +$(($(grep -n -i "$palavra_chave" "$arquivo" | cut -d: -f1) + 1)) "$arquivo")
                  fi
-               fi
-             done
+               done
+             done < "$arquivo"
            done
          fi
          
          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
-       
+      
          if [ "$encontrada" == true ]; then
            echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
            gh pr edit ${{ github.event.number }} --add-label bug
          fi
-       
+      
          echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
-       
+      
          if [ "$encontrada" == true ]; then
            SLACK_MESSAGE="Label 'Bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -106,7 +118,7 @@ jobs:
            AUTHOR_NAME=${{ github.event.pull_request.user.login }}
          
            gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-       
+      
            Deploy crítico.
            Horário sugerido de implementação após as 23:00
            "
