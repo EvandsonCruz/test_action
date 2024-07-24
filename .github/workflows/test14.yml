@@ -26,9 +26,7 @@ jobs:
         run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
       - name: Setup GitHub CLI
-        uses: cli/gh-action@v2
-        with:
-          token: ${{ secrets.GH_TOKEN }}
+        uses: actions/setup-gh-cli@v2
 
       - name: Imprimir alterações
         run: |
