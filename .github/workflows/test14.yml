@@ -64,14 +64,12 @@ jobs:
                    echo "Encontrada a palavra-chave '$palavra_chave' no arquivo: $arquivo"
       
                    # Verificar se há uma linha subsequente que contém a outra palavra
-                   while IFS= read -r next_line; do
-                     if echo "$next_line" | grep -q -i "$outra_palavra"; then
-                       echo "Encontrada a outra palavra '$outra_palavra' após '$palavra_chave' no arquivo: $arquivo"
-                       encontrada=true
-                       saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                       break
-                     fi
-                   done < <(tail -n +$(($(grep -n -i "$palavra_chave" "$arquivo" | cut -d: -f1) + 1)) "$arquivo")
+                   if grep -q -i "$outra_palavra" <(tail -n +$(($(grep -n -i "$palavra_chave" "$arquivo" | cut -d: -f1) + 1)) "$arquivo"); then
+                     echo "Encontrada a outra palavra '$outra_palavra' após '$palavra_chave' no arquivo: $arquivo"
+                     encontrada=true
+                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                     break
+                   fi
                  fi
                done
              done < "$arquivo"
@@ -86,14 +84,12 @@ jobs:
                  if echo "$line" | grep -q -i "$palavra_chave"; then
                    echo "Encontrada a palavra-chave '$palavra_chave' no arquivo: $arquivo"
                    
-                   while IFS= read -r next_line; do
-                     if echo "$next_line" | grep -q -i "$outra_palavra"; then
-                       echo "Encontrada a outra palavra '$outra_palavra' após '$palavra_chave' no arquivo: $arquivo"
-                       encontrada=true
-                       saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                       break
-                     fi
-                   done < <(tail -n +$(($(grep -n -i "$palavra_chave" "$arquivo" | cut -d: -f1) + 1)) "$arquivo")
+                   if grep -q -i "$outra_palavra" <(tail -n +$(($(grep -n -i "$palavra_chave" "$arquivo" | cut -d: -f1) + 1)) "$arquivo"); then
+                     echo "Encontrada a outra palavra '$outra_palavra' após '$palavra_chave' no arquivo: $arquivo"
+                     encontrada=true
+                     saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
+                     break
+                   fi
                  fi
                done
              done < "$arquivo"
