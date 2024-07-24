@@ -22,10 +22,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      #- name: Configurar variável de ambiente GH_TOKEN
-        #run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
-        #env: 
-      #    GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Configurar variável de ambiente GH_TOKEN
+        uses: ksivamuthu/actions-setup-gh-cli@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Imprimir alterações
         run: |
@@ -34,8 +34,6 @@ jobs:
           git diff --name-only ${{ github.event.before }} ${{ github.sha }}  
 
       - name: Verificar Conteúdo do PR
-        env: 
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
          palavras_chave=("ALTER TABLE" "DROP PACKAGE")  # Substitua pela lista de palavras-chave desejada
          outras_palavras=("AB.ABC" "AB.CAB")  # Substitua pela segunda lista de palavras 
