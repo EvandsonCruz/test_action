@@ -22,8 +22,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      #- name: Configurar variável de ambiente GH_TOKEN
-      #  run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
+      - name: Configurar variável de ambiente GH_TOKEN
+        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
       - name: Imprimir alterações
         run: |
@@ -87,57 +87,24 @@ jobs:
          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
      
          if [ "$encontrada" == true ]; then
-            echo "::set-output name=encontrada::true"
-            echo "::set-output name=saida::$saida"
-          else
-            echo "::set-output name=encontrada::false"
-          fi
+           echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
+           gh pr edit ${{ github.event.number }} --add-label bug
+         fi
      
-      - name: Adicionar Label
-        if: steps.verificar-conteudo.outputs.encontrada == 'true'
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          script: |
-            const { context } = require('@actions/github');
-            github.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              labels: ['Crítico']
-            });
-
-      - name: Comentar no PR
-        if: steps.verificar-conteudo.outputs.encontrada == 'true'
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.DEVOPS_TOKEN }}
-          script: |
-            const { context } = require('@actions/github');
-            const prNumber = context.issue.number;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const author = context.payload.pull_request.user.login;
-            const body = `@${author}\n\nDeploy crítico.\nHorário sugerido de implementação após as 23:00 pois impacta PEDIDO VENDA.\n\n${{ steps.verificar-conteudo.outputs.saida }}`;
-
-            github.issues.createComment({
-              owner: owner,
-              repo: repo,
-              issue_number: prNumber,
-              body: body
-            });
-
-            echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
-            if [ "$encontrada" == true ]; then
-            SLACK_MESSAGE="Label 'Bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-            PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
-            REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
-            REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
-            AUTHOR_NAME=${{ github.event.pull_request.user.login }}         
-            #gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-            #Deploy crítico.
-            #Horário sugerido de implementação após as 23:00
-            #"
-            exit 0
-            fi
+         echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
+     
+         if [ "$encontrada" == true ]; then
+           SLACK_MESSAGE="Label 'Bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+         
+           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+     
+           Deploy crítico.
+           Horário sugerido de implementação após as 23:00
+           "
+           exit 0
+         fi
