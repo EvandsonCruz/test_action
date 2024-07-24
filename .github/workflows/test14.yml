@@ -34,6 +34,8 @@ jobs:
           git diff --name-only ${{ github.event.before }} ${{ github.sha }}  
 
       - name: Verificar Conteúdo do PR
+        env: 
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
          palavras_chave=("ALTER TABLE" "DROP PACKAGE")  # Substitua pela lista de palavras-chave desejada
          outras_palavras=("AB.ABC" "AB.CAB")  # Substitua pela segunda lista de palavras 
