@@ -22,18 +22,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Instalar o GitHub CLI
-        run: |
-         sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-         sudo apt-add-repository https://cli.github.com/packages
-         sudo apt update
-         sudo apt install gh
-
       - name: Configurar variável de ambiente GH_TOKEN
         run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
-
-      - name: Autenticar o GitHub CLI
-        run: gh auth login --with-token <<< "${{ secrets.GH_TOKEN }}"
 
       - name: Imprimir alterações
         run: |
