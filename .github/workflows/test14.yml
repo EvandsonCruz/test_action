@@ -32,7 +32,9 @@ jobs:
         run: |
           echo "Referência antes do evento: ${{ github.event.before }}"
           echo "SHA do commit atual: ${{ github.sha }}"
-          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}
+          BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+          git diff --name-only $BASE_COMMIT ${{ github.sha }}
+
 
       - name: Verificar Conteúdo do PR
         env:
@@ -53,7 +55,7 @@ jobs:
             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
     
             # Obtém a lista de arquivos adicionados no pull request
-            arquivos_adicionados=($(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}))
+            arquivos_adicionados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
             echo "##########################arquivos_adicionados###################################  ${arquivos_adicionados[*]}"
     
             for arquivo in "${arquivos_adicionados[@]}"; do
