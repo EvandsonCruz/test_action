@@ -40,6 +40,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
           palavras_chave=("ALTER TABLE" "DROP PACKAGE")  # Substitua pela lista de palavras-chave desejada
           outras_palavras=("AB.ABC" "AB.ABC_2")  # Substitua pela segunda lista de palavras 
       
@@ -80,7 +81,7 @@ jobs:
               done < "$arquivo"
             done
           else
-            for arquivo in $(git diff --name-only ${{ github.event.before }} ${{ github.sha }}); do
+            for arquivo in $(git diff --name-only $BASE_COMMIT ${{ github.sha }}); do
               while IFS= read -r line; do
                 for palavra_chave in "${palavras_chave[@]}"; do
                   for outra_palavra in "${outras_palavras[@]}"; do
