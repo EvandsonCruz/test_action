@@ -53,7 +53,7 @@ jobs:
             echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
     
             # Obtém a lista de arquivos adicionados no pull request
-            arquivos_adicionados=(${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+            arquivos_adicionados=(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
             echo "##########################arquivos_adicionados###################################  ${arquivos_adicionados[*]}"
     
             for arquivo in "${arquivos_adicionados[@]}"; do
