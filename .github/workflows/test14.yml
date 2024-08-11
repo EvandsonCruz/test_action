@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "Referência antes do evento: ${{ github.event.before }}"
           echo "SHA do commit atual: ${{ github.sha }}"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}
 
       - name: Verificar Conteúdo do PR
         env:
