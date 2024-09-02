@@ -1,4 +1,4 @@
-name: ponto e virgula e barra
+name: virgula e parenteses
 
 on:
   pull_request:
