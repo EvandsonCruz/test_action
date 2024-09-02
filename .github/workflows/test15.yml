@@ -11,7 +11,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  validar-create-table:
+  validar-virgula-coluna:
     runs-on: ubuntu-latest
 
     steps:
