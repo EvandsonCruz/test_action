@@ -1,0 +1,65 @@
+name: ponto e virgula e barra
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+    paths-ignore:
+      - '.github/workflows/**'
+
+jobs:
+  validar-fim-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Configurar variável de ambiente GH_TOKEN
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
+
+    - name: Obter conteúdo do pull request
+      id: obter-conteudo
+      run: |
+
+        # Obtém a lista de arquivos adicionados no pull request
+        arquivos_adicionados=($(git diff --name-only HEAD^1))
+        #echo "##########################arquivos_adicionados###################################  $arquivos_adicionados"
+        set -x
+        encontrada=false  # Inicializa encontrada como falso fora do loop
+        check=""  # Inicializa a variável de saída
+
+        for arquivo in "${arquivos_adicionados[@]}"; do
+          if grep -Ei -q '(create|alter) (table|index|sequence)' "$arquivo"; then
+          echo "Validando arquivo adicionado: $arquivo"
+          check=$(awk '/;.*$/{flag=1; next} /\/$/{if(flag){print "Encontrado ;/ no arquivo"}} {flag=0}' "$arquivo")
+          if [[ -n "$check" ]]; then
+            echo "O arquivo $arquivo tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
+            encontrada=true
+            saida+="$saida$arquivo"$'\n'
+            #echo "identificador >>>>>>>>>>>>>>>>>>>>>> $identificador"
+          fi
+         fi 
+        done
+
+        if [ "$encontrada" == true ]; then
+          echo "::error::Existe arquivo no PR que tem ; e /. Isso pode causar erro por tentativa de execução duplicada"
+          SLACK_MESSAGE="Existe arquivo no PR que tem ; e /.  PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
+          Existe arquivo no PR que tem ; e /
+          ${saida}Isso pode causar erro por tentativa de execução duplicada
+          Por favor revisar, manter somente a /"
+          exit 1
+        else
+          echo "PR OK"
+        fi
