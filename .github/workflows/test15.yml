@@ -35,7 +35,7 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           if grep -Ei -q 'create table' "$arquivo"; then
             echo "Validando arquivo adicionado: $arquivo"
-            if grep -Pzoq 'create table[\s\S]*?\([\s\S]*,\s*\)' "$arquivo"; then
+            if grep -Pzoqi 'create table[\s\S]*?\([\s\S]*,\s*\)' "$arquivo"; then
               echo "O arquivo $arquivo contém uma vírgula extra após a última coluna na criação da tabela."
               encontrada=true
               saida+="$saida$arquivo"$'\n'
