@@ -54,7 +54,7 @@ jobs:
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
           Existe arquivo no PR com uma vírgula extra após a última coluna na criação da tabela.
-          ${saida}Por favor revisar e remover a vírgula extra."
+          ${saida}Por favor revisar"
           exit 1
         else
           echo "PR OK"
