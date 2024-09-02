@@ -26,8 +26,9 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-        arquivos_adicionados=($(git diff --name-only HEAD^1))
-
+        BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+        arquivos_adicionados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
+        
         set -x
         encontrada=false
         saida=""
