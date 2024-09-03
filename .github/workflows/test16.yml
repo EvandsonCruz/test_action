@@ -45,8 +45,10 @@ jobs:
 
             # Extrair colunas entre parênteses após CREATE TABLE
             colunas=$(grep -Pzo 'CREATE TABLE[\s\S]*?\([\s\S]*?\)' "$arquivo" |
-                      sed -e 's/CREATE TABLE[\s\S]*(\(.*\))/\1/' |  # Remove o texto antes das colunas
-                      sed -e 's/^\s*//;s/\s*$//;s/,\s*/\n/g' |  # Substitui vírgulas por novas linhas
+                      awk -F'(' '{print $2}' |  # Extrai o conteúdo entre parênteses
+                      awk -F')' '{print $1}' |  # Remove o conteúdo após o fechamento do parêntese
+                      tr -d '[:space:]' |  # Remove espaços em branco
+                      tr ',' '\n' |  # Substitui vírgulas por novas linhas
                       grep -v -i 'CONSTRAINT' |  # Remove linhas com restrições
                       grep -v '^[^a-zA-Z0-9_]' |  # Remove linhas que não contêm nomes de colunas válidos
                       sort |
