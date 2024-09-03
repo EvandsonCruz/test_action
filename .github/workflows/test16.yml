@@ -36,10 +36,10 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           if grep -Eiq 'create table' "$arquivo"; then  # O 'i' em grep -Ei torna a busca case-insensitive
             echo "Validando arquivo adicionado: $arquivo"
-            
-            # Extrai o conteúdo dentro dos parênteses do CREATE TABLE de forma case-insensitive
-            colunas=$(awk 'BEGIN{IGNORECASE=1} /CREATE TABLE/,/\)/' "$arquivo" | grep -v -i 'create table' | grep -v -i ')' | sed 's/^\s*//;s/\s*$//;s/ .*$//')
 
+            # Extrai o conteúdo dentro dos parênteses do CREATE TABLE
+            colunas=$(awk 'BEGIN{IGNORECASE=1} /CREATE TABLE/,/\)/' "$arquivo" | sed -n '/(/,/\)/p' | sed '1d;$d' | sed 's/^\s*//;s/\s*$//;s/ .*$//')
+            
             duplicatas=$(echo "$colunas" | sort | uniq -d)
             
             if [ -n "$duplicatas" ]; then
