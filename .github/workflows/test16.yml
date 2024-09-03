@@ -36,23 +36,23 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           if grep -Eiq 'create table' "$arquivo"; then
             echo "Validando arquivo adicionado: $arquivo"
-
+  
             # Verificar se o arquivo é binário e converter para texto, se necessário
             if file "$arquivo" | grep -qi 'binary'; then
               echo "Arquivo $arquivo é binário e será ignorado."
               continue
             fi
-
-            # Extrair colunas entre parênteses após CREATE TABLE
+  
+            # Extrair as colunas entre parênteses após CREATE TABLE
             colunas=$(grep -Pzo 'CREATE TABLE[\s\S]*?\([\s\S]*?\)' "$arquivo" |
-                      sed -e 's/CREATE TABLE[\s\S]*\(\(.*\)\)/\1/' |  # Remove o texto antes e após as colunas
-                      sed -e 's/^\s*//;s/\s*$//;s/,/,\n/g' |  # Substitui vírgulas por novas linhas
-                      tr -d '[:space:]' |  # Remove espaços em branco
-                      grep -v -i 'CONSTRAINT' |  # Remove linhas com restrições
-                      grep -v '^[^a-zA-Z0-9_]' |  # Remove linhas que não contêm nomes de colunas válidos
+                      sed -e 's/CREATE TABLE[\s\S]*(\(.*\))/\1/' |  # Remove o texto antes das colunas
+                      sed -e 's/^\s*//;s/\s*$//;s/,\s*/\n/g' |  # Substitui vírgulas por novas linhas
+                      awk '{print tolower($0)}' |  # Normaliza os nomes das colunas para minúsculas
+                      grep -v -i 'constraint' |  # Remove linhas com restrições
+                      grep -v '^[^a-zA-Z0-9_]' |  # Remove linhas que não contêm nomes válidos
                       sort |
                       uniq -d)  # Identifica duplicatas
-            
+
             if [ -n "$colunas" ]; then
               echo "O arquivo $arquivo contém colunas duplicadas: $colunas"
               encontrada=true
