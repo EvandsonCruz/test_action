@@ -34,18 +34,21 @@ jobs:
         saida=""
 
         for arquivo in "${arquivos_adicionados[@]}"; do
-          if grep -Eiq 'create table' "$arquivo"; then  # O 'i' em grep -Ei torna a busca case-insensitive
+          if grep -Eiq 'create table' "$arquivo"; then
             echo "Validando arquivo adicionado: $arquivo"
 
-            # Extrai o conteúdo dentro dos parênteses do CREATE TABLE
-            colunas=$(awk 'BEGIN{IGNORECASE=1} /CREATE TABLE/{flag=1; next} /\)/{flag=0} flag' "$arquivo" | sed 's/^\s*//;s/\s*$//;s/ .*$//')
+            # Extrair todas as linhas dentro dos parênteses
+            colunas=$(awk 'BEGIN{IGNORECASE=1} /CREATE TABLE/{flag=1; next} /\)/{flag=0} flag' "$arquivo" |
+                      sed '/^$/d' |  # Remove linhas vazias
+                      sed 's/^\s*//;s/\s*$//;s/ .*$//' |  # Remove espaços e tipo de dados
+                      grep -v -i 'CONSTRAINT' |  # Remove linhas com restrições
+                      sort |
+                      uniq -d)  # Identifica duplicatas
             
-            duplicatas=$(echo "$colunas" | sort | uniq -d)
-            
-            if [ -n "$duplicatas" ]; then
-              echo "O arquivo $arquivo contém colunas duplicadas: $duplicatas"
+            if [ -n "$colunas" ]; then
+              echo "O arquivo $arquivo contém colunas duplicadas: $colunas"
               encontrada=true
-              saida+="$saida$arquivo: $duplicatas"$'\n'
+              saida+="$saida$arquivo: $colunas"$'\n'
             fi
           fi
         done
