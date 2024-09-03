@@ -38,7 +38,7 @@ jobs:
             echo "Validando arquivo adicionado: $arquivo"
             
             # Extrai as colunas da criação de tabelas e verifica duplicatas
-            colunas=$(grep -Pzo 'create table[\s\S]*?\(([\s\S]*?)\)' "$arquivo" | tr ',' '\n' | sed 's/^\s*//;s/\s*$//;s/ .*$//')
+            colunas=$(grep -Pzoi 'create table[\s\S]*?\(([\s\S]*?)\)' "$arquivo" | tr ',' '\n' | sed 's/^\s*//;s/\s*$//;s/ .*$//')
 
             duplicatas=$(echo "$colunas" | sort | uniq -d)
             
