@@ -37,14 +37,12 @@ jobs:
           if grep -Eiq 'create table' "$arquivo"; then
             echo "Validando arquivo adicionado: $arquivo"
 
-            # Extrair conteúdo entre parênteses após CREATE TABLE
-            colunas=$(awk 'BEGIN{IGNORECASE=1} /CREATE TABLE/{flag=1; next} /\)/{flag=0} flag' "$arquivo" |
-                      sed -e 's/^[^)]*(//' -e 's/)[^)]*$//' |  # Remove o texto antes e depois dos parênteses
-                      sed 's/^\s*//;s/\s*$//' |  # Remove espaços
+            # Extrair colunas entre parênteses após CREATE TABLE
+            colunas=$(grep -Pzo 'CREATE TABLE[\s\S]*?\([\s\S]*?\)' "$arquivo" |
+                      sed -e 's/CREATE TABLE[\s\S]*(\(.*\))/\1/' |  # Remove o texto antes das colunas
+                      sed 's/^\s*//;s/\s*$//;s/,\s*/\n/g' |  # Substitui vírgulas por novas linhas
                       grep -v -i 'CONSTRAINT' |  # Remove linhas com restrições
-                      tr -d '[:space:]' |  # Remove espaços em branco restantes
                       grep -v '^[^a-zA-Z0-9_]' |  # Remove linhas que não contêm nomes de colunas válidos
-                      tr ',' '\n' |  # Quebra as colunas em linhas
                       sort |
                       uniq -d)  # Identifica duplicatas
             
