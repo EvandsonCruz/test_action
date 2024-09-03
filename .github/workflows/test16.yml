@@ -47,9 +47,9 @@ jobs:
             colunas=$(grep -Pzo 'CREATE TABLE[\s\S]*?\([\s\S]*?\)' "$arquivo" |
                       sed -e 's/CREATE TABLE[\s\S]*?\(\(.*\)\)/\1/' |  # Remove o texto antes das colunas e parênteses finais
                       sed -e 's/^\s*//;s/\s*$//;s/,\s*/\n/g' |  # Substitui vírgulas por novas linhas
-                      awk '{print tolower($0)}' |  # Normaliza os nomes das colunas para minúsculas
-                      grep -v -i 'constraint' |  # Remove linhas com restrições
+                      grep -v -i 'CONSTRAINT' |  # Remove linhas com restrições
                       grep -v '^[^a-zA-Z0-9_]' |  # Remove linhas que não contêm nomes válidos
+                      awk '{print tolower($0)}' |  # Normaliza os nomes das colunas para minúsculas
                       sort |
                       uniq -d)  # Identifica duplicatas
 
