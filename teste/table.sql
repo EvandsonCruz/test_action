@@ -9,7 +9,8 @@ CREATE TABLE employees (
     salary NUMBER(8,2),
     commission_pct NUMBER(2,2),
     manager_id NUMBER(6),
+    manager_id date,
     department_id NUMBER(4),
     CONSTRAINT fk_department
-        FOREIGN KEY (department_id) REFERENCES departments(department_id),
+        FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );
