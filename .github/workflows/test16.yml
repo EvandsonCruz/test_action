@@ -28,7 +28,7 @@ jobs:
       run: |
         BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
         arquivos_adicionados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
-        
+
         set -x
         encontrada=false
         saida=""
@@ -36,13 +36,13 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           if grep -Eiq 'create table' "$arquivo"; then
             echo "Validando arquivo adicionado: $arquivo"
-  
+
             # Verificar se o arquivo é binário e converter para texto, se necessário
             if file "$arquivo" | grep -qi 'binary'; then
               echo "Arquivo $arquivo é binário e será ignorado."
               continue
             fi
-  
+
             # Extrair as colunas entre parênteses após CREATE TABLE
             colunas=$(grep -Pzo 'CREATE TABLE[\s\S]*?\([\s\S]*?\)' "$arquivo" |
                       sed -e 's/CREATE TABLE[\s\S]*?\(\(.*\)\)/\1/' |  # Remove o texto antes das colunas e parênteses finais
@@ -52,6 +52,9 @@ jobs:
                       awk '{print tolower($0)}' |  # Normaliza os nomes das colunas para minúsculas
                       sort |
                       uniq -d)  # Identifica duplicatas
+
+            # Debug: Mostrar as colunas extraídas
+            echo "Colunas extraídas: $colunas"
 
             if [ -n "$colunas" ]; then
               echo "O arquivo $arquivo contém colunas duplicadas: $colunas"
