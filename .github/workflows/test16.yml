@@ -42,7 +42,7 @@ jobs:
           # Validação de colunas duplicadas em CREATE TABLE
           if grep -Ei -q 'create table' "$arquivo"; then
             echo "Validando colunas duplicadas em: $arquivo"
-            duplicadas=$(awk 'BEGIN {IGNORECASE=1} /CREATE TABLE/,/\);/ {if (tolower($1) != "" && tolower($1) !~ /^(comment|grant|create index|cache|increment|foreign|create|constraint|start)$/) print tolower($1)}' "$arquivo" | sort | uniq -d | tr '\n' ', ' | sed 's/,/, /g' | sed 's/, $//')
+            duplicadas=$(awk 'BEGIN {IGNORECASE=1} /CREATE TABLE/,/\);|\/$/ {if (tolower($1) != "" && tolower($1) !~ /^(comment|grant|create index|cache|increment|foreign|create|constraint|start|\/)$/) print tolower($1)}' "$arquivo" | sort | uniq -d | tr '\n' ', ' | sed 's/,/, /g' | sed 's/, $//')
 
             if [[ -n "$duplicadas" ]]; then
                 echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
