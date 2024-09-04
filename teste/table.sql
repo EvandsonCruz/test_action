@@ -27,3 +27,7 @@ GRANT INSERT ON employees TO hr
 /
 GRANT INSERT ON employees TO hr
 /
+CREATE INDEX idx_employee_email ON employees (email)
+/
+CREATE INDEX idx_employee_last_name ON employees (last_name)
+/
