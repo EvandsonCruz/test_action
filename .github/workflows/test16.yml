@@ -42,7 +42,7 @@ jobs:
           # Validação de colunas duplicadas em CREATE TABLE
           if grep -Ei -q 'create table' "$arquivo"; then
             echo "Validando colunas duplicadas em: $arquivo"
-            duplicadas=$(awk 'BEGIN {IGNORECASE=1} /CREATE TABLE/ {in_table=1; next} /\);/ {in_table=0} in_table && !/^\s*(PRIMARY KEY|FOREIGN KEY|CONSTRAINT|UNIQUE|CHECK|DEFAULT|NOT NULL|COMMENT|GRANT|CREATE INDEX|CREATE SEQUENCE|CREATE OR REPLACE PUBLIC SYNONYM)/ {if ($1 != "" && $2 != "" && $1 !~ /^[\(\)\s]+$/) print $1}' "$arquivo" | sort | uniq -d | tr '\n' ', ' | sed 's/,/, /g' | sed 's/, $//')
+            duplicadas=$(awk 'BEGIN {IGNORECASE=1} /CREATE TABLE/ {in_table=1; next} /\);/ {in_table=0} in_table && !/^\s*(PRIMARY KEY|FOREIGN KEY|CONSTRAINT|UNIQUE|CHECK|DEFAULT|NOT NULL|COMMENT|GRANT|CREATE INDEX|CREATE SEQUENCE|CREATE OR REPLACE PUBLIC SYNONYM)/ {if ($1 != "" && $2 != "" && $1 !~ /^[\(\)\s]+$/) print $1}' "$arquivo" | grep -v -E '^\s*(CREATE|COMMENT|GRANT|INDEX|SEQUENCE|SYNONYM|TABLE|FOREIGN|PRIMARY|KEY|CONSTRAINT|UNIQUE|CHECK|DEFAULT|NOT|NULL|ON)$' | sort | uniq -d | tr '\n' ', ' | sed 's/,/, /g' | sed 's/, $//')
             if [[ -n "$duplicadas" ]]; then
                 echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
                 encontrada=true
