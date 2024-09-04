@@ -10,7 +10,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  validar-duplicadas:
+  validar-colunas:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,15 +25,13 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-        set -x
-        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
         encontrada=false
         saida=""
-        
+
+        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+
         # Obtém a lista de arquivos adicionados no pull request
-        BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
-        arquivos_adicionados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
-    
+        arquivos_adicionados=($(git diff --name-only HEAD^1))
         echo "Arquivos adicionados: ${arquivos_adicionados[@]}"
 
         for arquivo in "${arquivos_adicionados[@]}"; do
@@ -46,7 +44,7 @@ jobs:
             if [[ -n "$duplicadas" ]]; then
                 echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
                 encontrada=true
-                saida+="$arquivo: Colunas duplicadas encontradas: $duplicadas"
+                saida+="$arquivo: Colunas duplicadas encontradas: $duplicadas\n"
             else
                 echo "Nenhuma coluna duplicada encontrada no arquivo $arquivo."
             fi
@@ -63,8 +61,7 @@ jobs:
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
           Erros encontrados no PR:
-          ${saida}
-          Por favor revisar"
+          ${saida}Por favor revisar."
           exit 1
         else
           echo "PR OK"
