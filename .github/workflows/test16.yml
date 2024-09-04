@@ -10,7 +10,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  validar-colunas:
+  validar-duplicadas:
     runs-on: ubuntu-latest
 
     steps:
