@@ -22,50 +22,45 @@ jobs:
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
-    - name: Obter conteúdo do pull request
-      id: obter-conteudo
+    - name: Listar arquivos do pull request
+      id: listar-arquivos
       run: |
-        set -x
-        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+        # Verifica se o commit pai existe, se não usa HEAD
+        base_ref=$(git rev-parse --abbrev-ref HEAD^1 2>/dev/null || echo "HEAD")
+        git diff --name-only $base_ref > files.txt
+        cat files.txt
+
+    - name: Verificar colunas duplicadas
+      run: |
         encontrada=false
         saida=""
-        
-        # Obtém a lista de arquivos adicionados no pull request
-        BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
-        arquivos_adicionados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
-    
-        echo "Arquivos adicionados: ${arquivos_adicionados[@]}"
 
-        for arquivo in "${arquivos_adicionados[@]}"; do
+        for arquivo in $(cat files.txt); do
           echo "Verificando o arquivo: $arquivo"
 
-          # Validação de colunas duplicadas em CREATE TABLE
           if grep -Ei -q 'create table' "$arquivo"; then
             echo "Validando colunas duplicadas em: $arquivo"
             duplicadas=$(awk '/CREATE TABLE/,/\);/ {if ($1 != "" && $2 != "") print $1}' "$arquivo" | sort | uniq -d | tr '\n' ', ' | sed 's/,/, /g' | sed 's/, $//')
             if [[ -n "$duplicadas" ]]; then
                 echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
                 encontrada=true
-                saida+="$arquivo: Colunas duplicadas encontradas: $duplicadas\n\n"
+                saida="$saida$arquivo: Colunas duplicadas encontradas: $duplicadas"$'\n'
             else
                 echo "Nenhuma coluna duplicada encontrada no arquivo $arquivo."
             fi
           fi
         done
 
-        # Remover a última quebra de linha extra
-        saida=$(echo -e "$saida" | sed '/^[[:space:]]*$/d')
-
-        if [ "$encontrada" == true ]; then
-          echo "::error::Erros encontrados no PR"
+        if [ "$encontrada" = true ]; then
+          echo "Enviando notificação para o Slack..."
           SLACK_MESSAGE="Erros encontrados no PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
-          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME\n\nErros encontrados no PR:\n\n${saida}\nPor favor revisar."
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME\n\nErros encontrados no PR:\n\n${saida}Por favor revisar."
           exit 1
         else
-          echo "PR OK"
+          echo "Nenhuma coluna duplicada encontrada. PR OK."
         fi
