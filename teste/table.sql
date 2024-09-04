@@ -12,6 +12,7 @@ CREATE TABLE employees (
     department_id NUMBER(4),
     supervisor_id NUMBER(6),
     address VARCHAR2(100),
+    address VARCHAR2(100),
     date_of_birth DATE,
     status CHAR(1) CHECK (status IN ('A', 'I')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
