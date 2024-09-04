@@ -46,7 +46,7 @@ jobs:
             if [[ -n "$duplicadas" ]]; then
                 echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
                 encontrada=true
-                saida+="$arquivo: Colunas duplicadas encontradas: $duplicadas\n"
+                saida+="$arquivo: Colunas duplicadas encontradas: $duplicadas\n\n"
             else
                 echo "Nenhuma coluna duplicada encontrada no arquivo $arquivo."
             fi
