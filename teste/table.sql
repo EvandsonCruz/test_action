@@ -9,9 +9,20 @@ create table employees (
     salary NUMBER(8,2),
     commission_pct NUMBER(2,2),
     manager_id NUMBER(6),
-    manager_id NUMBER(6),
     department_id NUMBER(4),
-    department_id date,
     CONSTRAINT fk_department
         FOREIGN KEY (department_id) REFERENCES departments(department_id)
-);
+)
+/
+COMMENT ON COLUMN employees.employee_id IS 'Identificador único do funcionário'
+/
+COMMENT ON COLUMN employees.first_name IS 'Nome do funcionário'
+/
+COMMENT ON COLUMN employees.last_name IS 'Sobrenome do funcionário'
+/
+GRANT SELECT ON employees TO hr
+/
+GRANT INSERT ON employees TO hr
+/
+GRANT UPDATE ON employees TO hr
+/
