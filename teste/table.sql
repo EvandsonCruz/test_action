@@ -11,6 +11,7 @@ CREATE TABLE employees (
     manager_id NUMBER(6),
     manager_id NUMBER(6),
     department_id NUMBER(4),
+    department_id date,
     CONSTRAINT fk_department
         FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );
