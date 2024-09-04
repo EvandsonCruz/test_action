@@ -46,7 +46,7 @@ jobs:
             if [[ -n "$duplicadas" ]]; then
                 echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
                 encontrada=true
-                saida+="$arquivo: Colunas duplicadas encontradas: $duplicadas"
+                saida+="$arquivo: Colunas duplicadas encontradas: $duplicadas\n"
             else
                 echo "Nenhuma coluna duplicada encontrada no arquivo $arquivo."
             fi
@@ -63,7 +63,7 @@ jobs:
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
           Erros encontrados no PR:
-          "${saida}"
+          ${saida}
           Por favor revisar"
           exit 1
         else
