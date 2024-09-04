@@ -62,7 +62,7 @@ jobs:
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
           Erros encontrados no PR:
           ${saida}
-          Por favor revisar."
+          Por favor revisar"
           exit 1
         else
           echo "PR OK"
