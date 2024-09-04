@@ -12,7 +12,9 @@ create table employees (
     manager_id NUMBER(6),
     department_id NUMBER(4),
     CONSTRAINT fk_department
-        FOREIGN KEY (department_id) REFERENCES departments(department_id)
+        FOREIGN KEY (department_id) REFERENCES departments(department_id),
+    CONSTRAINT fk_supervisor
+        FOREIGN KEY (supervisor_id) REFERENCES employees(employee_id)
 )
 /
 COMMENT ON COLUMN employees.employee_id IS 'Identificador único do funcionário'
@@ -30,4 +32,18 @@ GRANT INSERT ON employees TO hr
 CREATE INDEX idx_employee_email ON employees (email)
 /
 CREATE INDEX idx_employee_last_name ON employees (last_name)
+/
+CREATE SEQUENCE employee_seq
+    START WITH 1
+    INCREMENT BY 1
+    CACHE 20
+/
+CREATE SEQUENCE employee_seq2
+    START WITH 1
+    INCREMENT BY 1
+    CACHE 20
+/
+CREATE OR REPLACE PUBLIC SYNONYM emp_synonym FOR employees;
+/
+CREATE OR REPLACE PUBLIC SYNONYM emp_synonym2 FOR employees;
 /
