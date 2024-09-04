@@ -25,13 +25,15 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
+        set -x
+        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
         encontrada=false
         saida=""
-
-        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
-
+        
         # Obtém a lista de arquivos adicionados no pull request
-        arquivos_adicionados=($(git diff --name-only HEAD^1))
+        BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
+        arquivos_adicionados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
+    
         echo "Arquivos adicionados: ${arquivos_adicionados[@]}"
 
         for arquivo in "${arquivos_adicionados[@]}"; do
