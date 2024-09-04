@@ -40,18 +40,18 @@ jobs:
           # Validação de colunas duplicadas em CREATE TABLE
           if grep -Ei -q 'create table' "$arquivo"; then
             echo "Validando colunas duplicadas em: $arquivo"
-            duplicadas=$(awk '/CREATE TABLE/,/\);/ {if ($1 != "" && $2 != "") print $1}' "$arquivo" | sort | uniq -d | tr '\n' ', ' | sed 's/, $//g')
-            if [[ -n "$duplicadas" ]]; then
+            duplicadas=$(awk '/CREATE TABLE/,/\);/ {if ($1 != "" && $2 != "") print $1}' "$arquivo" | sort | uniq -d | tr '\n' ', ' | sed 's/, $//')
+            if [[ -n "$duplicadas" ]]; então
                 echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
                 encontrada=true
-                saida+="$saida$arquivo: Colunas duplicadas encontradas ($duplicadas)"$'\n'
+                saida+="$arquivo: Colunas duplicadas encontradas ($duplicadas)"$'\n'
             else
                 echo "Nenhuma coluna duplicada encontrada no arquivo $arquivo."
             fi
           fi
         done
 
-        if [ "$encontrada" == true ]; then
+        if [ "$encontrada" == true ]; então
           echo "::error::Erros encontrados no PR"
           SLACK_MESSAGE="Erros encontrados no PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
