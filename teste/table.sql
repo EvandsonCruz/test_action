@@ -35,12 +35,16 @@ COMMENT ON COLUMN employees.email IS 'Email do funcionário'
 /
 COMMENT ON COLUMN employees.phone_number IS 'Número de telefone do funcionário'
 /
-COMMENT ON COLUMN employees.hire_date IS 'Data de contratação do funcionário'
+COMMENT ON COLUMN employees.hire_date 
+    IS 'Data de contratação do funcionário'
+    
 /
-COMMENT ON COLUMN employees.job_id IS 'Cargo do funcionário'
-/
-COMMENT ON COLUMN employees.salary IS 'Salário do funcionário'
-/
+COMMENT ON COLUMN employees.job_id 
+    IS 'Cargo do funcionário';
+
+COMMENT ON COLUMN employees.salary 
+    IS 'Salário do funcionário';
+
 COMMENT ON COLUMN employees.commission_pct IS 'Percentual de comissão do funcionário'
 /
 COMMENT ON COLUMN employees.manager_id IS 'ID do gerente do funcionário'
