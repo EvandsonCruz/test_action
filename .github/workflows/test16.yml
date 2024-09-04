@@ -1,4 +1,4 @@
-name: Validar colunas duplicadas
+name: validar-colunas-duplicadas
 on:
   pull_request:
     types:
@@ -6,6 +6,8 @@ on:
       - synchronize
       - reopened
       - edited
+    paths-ignore:
+      - '.github/workflows/**'
 
 jobs:
   validar-colunas:
@@ -15,59 +17,53 @@ jobs:
     - name: Checkout do repositório
       uses: actions/checkout@v2
       with:
-        fetch-depth: 1
+        fetch-depth: 0
 
     - name: Configurar variável de ambiente GH_TOKEN
       run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
-    - name: Obter lista de arquivos alterados
+    - name: Obter conteúdo do pull request
+      id: obter-conteudo
       run: |
-        problemas=false
-        mensagem_erro=""
+        encontrada=false
+        saida=""
 
-        # Verifica se o commit pai existe, se não usa HEAD
-        base_ref=$(git rev-parse --abbrev-ref HEAD^1 2>/dev/null || echo "HEAD")
-        arquivos_alterados=$(git diff --name-only $base_ref)
+        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
 
-        for arquivo in $arquivos_alterados; do
-          if grep -qiE 'CREATE TABLE' "$arquivo"; then
-            colunas_duplicadas=()
+        # Obtém a lista de arquivos adicionados no pull request
+        arquivos_adicionados=($(git diff --name-only HEAD^1))
+        echo "Arquivos adicionados: ${arquivos_adicionados[@]}"
+
+        for arquivo in "${arquivos_adicionados[@]}"; do
+          echo "Verificando o arquivo: $arquivo"
+
+          # Validação de colunas duplicadas em CREATE TABLE
+          if grep -Ei -q 'create table' "$arquivo"; then
+            echo "Validando colunas duplicadas em: $arquivo"
             duplicadas=$(awk '/CREATE TABLE/,/\);/ {if ($1 != "" && $2 != "") print $1}' "$arquivo" | sort | uniq -d)
-            if [ -n "$duplicadas" ]; then
-              problemas=true
-              colunas_duplicadas+=("$duplicadas")
-            fi
-            if [ ${#colunas_duplicadas[@]} -ne 0 ]; then
-              colunas_duplicadas_str=""
-              for coluna in "${colunas_duplicadas[@]}"; do
-                colunas_duplicadas_str+="$coluna, "
-              done
-              colunas_duplicadas_str=${colunas_duplicadas_str%, } # Remove a última vírgula e espaço
-              mensagem_erro+="Arquivo: $arquivo, Colunas duplicadas: $colunas_duplicadas_str\n"
+            if [[ -n "$duplicadas" ]]; then
+                echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
+                encontrada=true
+                saida+="$saida$arquivo: Colunas duplicadas encontradas ($duplicadas)"$'\n'
+            else
+                echo "Nenhuma coluna duplicada encontrada no arquivo $arquivo."
             fi
           fi
         done
 
-        if [ "$problemas" = true ]; then
-          mensagem_erro=$(echo -e "$mensagem_erro" | sed 's/\n$//')
-
-          echo "::error::Foram encontradas colunas duplicadas na criação de tabela: $mensagem_erro"
-
-          SLACK_MESSAGE="PR ${{ github.event.number }} - github.com/${{ github.repository }}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n\nForam encontradas colunas duplicadas na criação de tabela nos seguintes arquivos:\n$mensagem_erro"
-
+        if [ "$encontrada" == true ]; then
+          echo "::error::Erros encontrados no PR"
+          SLACK_MESSAGE="Erros encontrados no PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-          
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
-          
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-
-          Foram encontradas colunas duplicadas na criação de tabela nos seguintes arquivos:
-
-        $mensagem_erro"
-        exit 1
+          Erros encontrados no PR:
+          ${saida}
+          Por favor revisar."
+          exit 1
         else
           echo "PR OK"
         fi
