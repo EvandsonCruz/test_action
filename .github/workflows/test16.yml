@@ -1,5 +1,4 @@
-name: validar-create-table
-
+name: validar-colunas-duplicadas
 on:
   pull_request:
     types:
@@ -11,7 +10,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  validar-coluna-duplicada:
+  validar-colunas:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,55 +25,44 @@ jobs:
     - name: Obter conteúdo do pull request
       id: obter-conteudo
       run: |
-        BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
-        arquivos_adicionados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
-
-        set -x
         encontrada=false
         saida=""
 
+        echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
+
+        # Obtém a lista de arquivos adicionados no pull request
+        arquivos_adicionados=($(git diff --name-only HEAD^1))
+        echo "Arquivos adicionados: ${arquivos_adicionados[@]}"
+
         for arquivo in "${arquivos_adicionados[@]}"; do
-          if grep -Eiq 'create table' "$arquivo"; then
-            echo "Validando arquivo adicionado: $arquivo"
+          echo "Verificando o arquivo: $arquivo"
 
-            # Verificar se o arquivo é binário e converter para texto, se necessário
-            if file "$arquivo" | grep -qi 'binary'; then
-              echo "Arquivo $arquivo é binário e será ignorado."
-              continue
-            fi
-
-            # Extrair as colunas entre parênteses após CREATE TABLE
-            colunas=$(grep -Pzo 'CREATE TABLE[\s\S]*?\([\s\S]*?\)' "$arquivo" |
-                      sed -e 's/CREATE TABLE[\s\S]*?\(\(.*\)\)/\1/' |  # Remove o texto antes das colunas e parênteses finais
-                      sed -e 's/^\s*//;s/\s*$//;s/,\s*/\n/g' |  # Substitui vírgulas por novas linhas
-                      grep -v -i 'CONSTRAINT' |  # Remove linhas com restrições
-                      grep -v '^[^a-zA-Z0-9_]' |  # Remove linhas que não contêm nomes válidos
-                      awk '{print tolower($0)}' |  # Normaliza os nomes das colunas para minúsculas
-                      sort |
-                      uniq -d)  # Identifica duplicatas
-
-            # Debug: Mostrar as colunas extraídas
-            echo "Colunas extraídas: $colunas"
-
-            if [ -n "$colunas" ]; then
-              echo "O arquivo $arquivo contém colunas duplicadas: $colunas"
-              encontrada=true
-              saida+="$saida$arquivo: $colunas"$'\n'
+          # Validação de colunas duplicadas em CREATE TABLE
+          if grep -Ei -q 'create table' "$arquivo"; then
+            echo "Validando colunas duplicadas em: $arquivo"
+            duplicadas=$(awk '/CREATE TABLE/,/\);/ {if ($1 != "" && $2 != "") print $1}' "$arquivo" | sort | uniq -d)
+            if [[ -n "$duplicadas" ]]; then
+                echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
+                encontrada=true
+                saida+="$saida$arquivo: Colunas duplicadas encontradas ($duplicadas)"$'\n'
+            else
+                echo "Nenhuma coluna duplicada encontrada no arquivo $arquivo."
             fi
           fi
         done
 
         if [ "$encontrada" == true ]; then
-          echo "::error::Existe arquivo no PR com colunas duplicadas na criação de tabelas."
-          SLACK_MESSAGE="Existe arquivo no PR com colunas duplicadas na criação de tabelas. PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+          echo "::error::Erros encontrados no PR"
+          SLACK_MESSAGE="Erros encontrados no PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
           PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
           REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
           AUTHOR_NAME=${{ github.event.pull_request.user.login }}
           gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-          Existe arquivo no PR com colunas duplicadas na criação de tabelas.
-          ${saida}Por favor revisar"
+          Erros encontrados no PR:
+          ${saida}
+          Por favor revisar."
           exit 1
         else
           echo "PR OK"
