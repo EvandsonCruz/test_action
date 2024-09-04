@@ -1,5 +1,4 @@
-name: deploy-critical
-
+name: validar-colunas-duplicadas
 on:
   pull_request:
     types:
@@ -7,119 +6,61 @@ on:
       - synchronize
       - reopened
       - edited
-    branches:
-      - main
     paths-ignore:
       - '.github/workflows/**'
 
 jobs:
-  validar-critico:
-    if: ${{ github.base_ref }} == 'main'
+  validar-duplicadas:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
-      - name: Setup GitHub CLI
-        uses: sersoft-gmbh/setup-gh-cli-action@v2
-        with:
-          version: stable
+    - name: Configurar variável de ambiente GH_TOKEN
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV 
 
-      - name: Imprimir alterações
-        run: |
-          echo "Referência antes do evento: ${{ github.event.before }}"
-          echo "SHA do commit atual: ${{ github.sha }}"
-          BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
-          git diff --name-only $BASE_COMMIT ${{ github.sha }}
+    - name: Listar arquivos do pull request
+      id: listar-arquivos
+      run: |
+        # Verifica se o commit pai existe, se não usa HEAD
+        base_ref=$(git rev-parse --abbrev-ref HEAD^1 2>/dev/null || echo "HEAD")
+        git diff --name-only $base_ref > files.txt
+        cat files.txt
 
+    - name: Verificar colunas duplicadas
+      run: |
+        encontrada=false
+        saida=""
 
-      - name: Verificar Conteúdo do PR
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
-          palavras_chave=("ALTER TABLE" "DROP PACKAGE")  # Substitua pela lista de palavras-chave desejada
-          outras_palavras=("AB.ABC" "AB.ABC_2")  # Substitua pela segunda lista de palavras 
-      
-          encontrada=false
-          saida=""
-          declare -A encontrados
-      
-          echo ">>>>>>>>>antes do for>>>>>>>>>>> $encontrada"
-          echo "#############################################################  ${{ github.event_name }}"
-          echo "##########################opened###################################  ${{ github.event.action }}"
-          
-          if [[ "${{ github.event.action }}" == "opened" || "${{ github.event.action }}" == "reopened" ]]; then
-            echo "Pull request acabou de ser aberto. Verificando novos arquivos adicionados."
-    
-            # Obtém a lista de arquivos adicionados no pull request
-            arquivos_adicionados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
-            echo "##########################arquivos_adicionados###################################  ${arquivos_adicionados[*]}"
-    
-            for arquivo in "${arquivos_adicionados[@]}"; do
-              echo "Novo arquivo adicionado: $arquivo"
-              
-              # Ler o arquivo linha por linha
-              while IFS= read -r line; do
-                for palavra_chave in "${palavras_chave[@]}"; do
-                  for outra_palavra in "${outras_palavras[@]}"; do
-                    # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
-                    if echo "$line" | grep -w -q -i "$palavra_chave" && echo "$line" | grep -w -q -i "$outra_palavra"; then
-                      key="$arquivo|$palavra_chave|$outra_palavra"
-                      if [[ -z "${encontrados[$key]}" ]]; then
-                        echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
-                        encontrados[$key]=true
-                        encontrada=true
-                        saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                      fi
-                    fi
-                  done
-                done
-              done < "$arquivo"
-            done
-          else
-            for arquivo in $(git diff --name-only $BASE_COMMIT ${{ github.sha }}); do
-              while IFS= read -r line; do
-                for palavra_chave in "${palavras_chave[@]}"; do
-                  for outra_palavra in "${outras_palavras[@]}"; do
-                    # Verificar se a linha contém tanto a palavra-chave quanto a outra palavra
-                    if echo "$line" | grep -w -q -i "$palavra_chave" && echo "$line" | grep -w -q -i "$outra_palavra"; then
-                      key="$arquivo|$palavra_chave|$outra_palavra"
-                      if [[ -z "${encontrados[$key]}" ]]; then
-                        echo "Encontrada a palavra-chave '$palavra_chave' e a outra palavra '$outra_palavra' na mesma linha no arquivo: $arquivo"
-                        encontrados[$key]=true
-                        encontrada=true
-                        saida="$saida$palavra_chave no objeto $outra_palavra no arquivo $arquivo\n"
-                      fi
-                    fi
-                  done
-                done
-              done < "$arquivo"
-            done
+        for arquivo in $(cat files.txt); do
+          echo "Verificando o arquivo: $arquivo"
+
+          if grep -Ei -q 'create table' "$arquivo"; then
+            echo "Validando colunas duplicadas em: $arquivo"
+            duplicadas=$(awk '/CREATE TABLE/,/\);/ {if ($1 != "" && $2 != "") print $1}' "$arquivo" | sort | uniq -d | tr '\n' ', ' | sed 's/,/, /g' | sed 's/, $//')
+            if [[ -n "$duplicadas" ]]; then
+                echo "O arquivo $arquivo tem colunas duplicadas: $duplicadas"
+                encontrada=true
+                saida="$saida$arquivo: Colunas duplicadas encontradas: $duplicadas"$'\n'
+            else
+                echo "Nenhuma coluna duplicada encontrada no arquivo $arquivo."
+            fi
           fi
-          
-          echo ">>>>>>>depois do for>>>>>>>>>>>>> $encontrada"
-    
-          if [ "$encontrada" == true ]; then
-            echo "::warning::Uma ou mais palavras-chave foram encontradas nos arquivos. Adicionando a label 'bug'..."
-            gh pr edit ${{ github.event.number }} --add-label bug
-          fi
-    
-          echo ">>>>>>>>>>depois da label>>>>>>>>>> $encontrada"
-    
-          if [ "$encontrada" == true ]; then
-            SLACK_MESSAGE="Label 'Bug' adicionada ao PR: ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
-            PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
-            REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
-            REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
-            AUTHOR_NAME=${{ github.event.pull_request.user.login }}
-        
-            gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME
-            Deploy crítico.
-            Horário sugerido de implementação após as 23:00"
-            exit 0
-          fi
+        done
+
+        if [ "$encontrada" = true ]; then
+          echo "Enviando notificação para o Slack..."
+          SLACK_MESSAGE="Erros encontrados no PR - ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\n$saida"
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
+          AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+          gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME\n\nErros encontrados no PR:\n\n${saida}Por favor revisar."
+          exit 1
+        else
+          echo "Nenhuma coluna duplicada encontrada. PR OK."
+        fi
