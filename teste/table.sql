@@ -1,4 +1,4 @@
-create table employees (
+CREATE TABLE employees (
     employee_id NUMBER(6) PRIMARY KEY,
     first_name VARCHAR2(20),
     last_name VARCHAR2(25) NOT NULL,
@@ -15,15 +15,15 @@ create table employees (
         FOREIGN KEY (department_id) REFERENCES departments(department_id)
 )
 /
-comment on column employees.employee_id IS 'Identificador único do funcionário'
+COMMENT ON COLUMN employees.employee_id IS 'Identificador único do funcionário'
 /
-comment on column employees.first_name IS 'Nome do funcionário'
+COMMENT ON COLUMN employees.first_name IS 'Nome do funcionário'
 /
-comment on column employees.last_name IS 'Sobrenome do funcionário'
+COMMENT ON COLUMN employees.last_name IS 'Sobrenome do funcionário'
 /
-comment on column ON employees TO hr
+COMMENT ON COLUMN ON employees TO hr
 /
-grant insert ON employees TO hr
+GRANT INSERT ON employees TO hr
 /
-grant insert ON employees TO hr
+GRANT INSERT ON employees TO hr
 /
