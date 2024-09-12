@@ -24,6 +24,9 @@ jobs:
           set -x
           BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
           arquivos_alterados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
+          saida=""
+          encontrado=false
+
           for arquivo in "${arquivos_alterados[@]}"; do
             encoding_info=$(file -i "$arquivo" | awk -F "=" '{print $2}' | tr -d ' ')
             if [ "$encoding_info" != "us-ascii" ] && [ "$encoding_info" != "utf-8" ] && [ "$encoding_info" != "iso-8859-1" ]; then
@@ -37,16 +40,18 @@ jobs:
           if [ "$encontrado" == true ]; then
             SLACK_MESSAGE="UTF-8 Encoding Error PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\nExiste arquivo que não está codificado como UTF-8.\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+            
             PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
             REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
             REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
             AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+            
             gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME\nExiste arquivo que não está codificado como UTF-8.\n$saida\nPor favor, corrija o encoding e faça um novo commit."
             exit 1
           else
             echo "PR OK"
-          if
-
+          fi  # Corrigido aqui
+          
   validar-encoding2:
     runs-on: ubuntu-latest
     steps:
@@ -62,6 +67,9 @@ jobs:
         run: |
           BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
           arquivos_alterados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
+          saida=""
+          encontrado=false
+
           for arquivo in "${arquivos_alterados[@]}"; do
             encoding_info=$(file -i "$arquivo" | awk -F "=" '{print $2}' | tr -d ' ')
             if [ "$encoding_info" != "us-ascii" ] && [ "$encoding_info" != "utf-8" ] && [ "$encoding_info" != "iso-8859-1" ]; then
@@ -75,12 +83,14 @@ jobs:
           if [ "$encontrado" == true ]; then
             SLACK_MESSAGE="UTF-8 Encoding Error PR ${{ github.event.number }} - github.com/${GITHUB_REPOSITORY}/pull/${{ github.event.number }}/files (${{ github.base_ref }})\nExiste arquivo que não está codificado como UTF-8.\n$saida"
             curl -X POST -H 'Content-type: application/json' --data '{"text":"'"$SLACK_MESSAGE"'"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+            
             PR_NUMBER=$(echo "${{ github.event.pull_request.html_url }}" | awk -F'/' '{print $NF}')
             REPO_OWNER=$(echo "${{ github.repository }}" | cut -d '/' -f 1)
             REPO_NAME=$(echo "${{ github.repository }}" | cut -d '/' -f 2)
             AUTHOR_NAME=${{ github.event.pull_request.user.login }}
+            
             gh pr comment $PR_NUMBER -R $REPO_OWNER/$REPO_NAME --body "@$AUTHOR_NAME\nExiste arquivo que não está codificado como UTF-8.\n$saida\nPor favor, corrija o encoding e faça um novo commit."
             exit 1
           else
             echo "PR OK"
-          if
+          fi  # Corrigido aqui também
