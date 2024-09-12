@@ -14,7 +14,7 @@ on:
 
 jobs:
   validar-critico:
-    if: ${{ github.base_ref }} == 'main'
+    if: ${{ github.base_ref }} == 'main' && ${{ vars.var_critico == 1 }}
     runs-on: ubuntu-latest
 
     steps:
