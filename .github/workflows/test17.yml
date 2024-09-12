@@ -21,6 +21,7 @@ jobs:
 
       - name: Obter lista de arquivos alterados
         run: |
+          set -x
           BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
           arquivos_alterados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
           for arquivo in "${arquivos_alterados[@]}"; do
