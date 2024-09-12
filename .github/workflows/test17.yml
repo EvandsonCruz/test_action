@@ -24,6 +24,7 @@ jobs:
           set -x
           BASE_COMMIT=$(git merge-base ${{ github.event.pull_request.base.sha }} ${{ github.sha }})
           arquivos_alterados=($(git diff --name-only $BASE_COMMIT ${{ github.sha }}))
+          saida=""
           for arquivo in "${arquivos_alterados[@]}"; do
             encoding_info=$(file -i "$arquivo" | awk -F "=" '{print $2}' | tr -d ' ')
             if [ "$encoding_info" != "us-ascii" ] && [ "$encoding_info" != "utf-8" ] && [ "$encoding_info" != "iso-8859-1" ]; then
