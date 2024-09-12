@@ -9,7 +9,7 @@ on:
 
 jobs:  
   validar-encoding:
-    if: ${{ env.teste == 1 }}
+    if: ${{ vars.var_teste == 1 }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do repositório
