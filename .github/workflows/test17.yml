@@ -45,7 +45,7 @@ jobs:
             exit 1
           else
             echo "PR OK"
-          done
+          if
 
   validar-encoding2:
     runs-on: ubuntu-latest
@@ -83,4 +83,4 @@ jobs:
             exit 1
           else
             echo "PR OK"
-          done
+          if
