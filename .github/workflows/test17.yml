@@ -9,6 +9,7 @@ on:
 
 jobs:  
   validar-encoding:
+    if: ${{ VAR.tes }} = 1
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do repositório
