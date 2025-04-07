@@ -37,7 +37,7 @@ jobs:
         for arquivo in "${arquivos_adicionados[@]}"; do
           echo "Verificando o arquivo: $arquivo"
 
-          if awk '/create index/ && !/tablespace/' "$arquivo" | grep -q "."; then
+          if awk 'BEGIN {IGNORECASE=1} /create index/ && !/tablespace/' "$arquivo" | grep -q "."; then
             encontrada=true
             saida="$saida$arquivo"$'\n'
           else
