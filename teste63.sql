@@ -1,0 +1,2 @@
+create table ab.teste;
+/
